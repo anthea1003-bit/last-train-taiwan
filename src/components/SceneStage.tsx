@@ -2,12 +2,14 @@ import { PointerEvent, ReactNode } from 'react';
 
 interface SceneStageProps {
   image: string;
+  regionId: string;
   reducedMotion: boolean;
   children: ReactNode;
 }
 
 export default function SceneStage({
   image,
+  regionId,
   reducedMotion,
   children
 }: SceneStageProps) {
@@ -39,13 +41,18 @@ export default function SceneStage({
 
   return (
     <div
-      className={`scene-stage ${reducedMotion ? 'is-reduced-motion' : ''}`}
+      className={`scene-stage scene-${regionId} ${reducedMotion ? 'is-reduced-motion' : ''}`}
       onPointerMove={handlePointerMove}
       onPointerLeave={(event) => resetDepth(event.currentTarget)}
     >
-      <img className="scene-stage-art" src={image} alt="" aria-hidden="true" />
+      <img className="scene-stage-art scene-art-back" src={image} alt="" aria-hidden="true" />
+      <img className="scene-stage-art scene-art-main" src={image} alt="" aria-hidden="true" />
+      <img className="scene-stage-art scene-art-front" src={image} alt="" aria-hidden="true" />
       <div className="scene-atmosphere scene-atmosphere-back" aria-hidden="true" />
       <div className="scene-atmosphere scene-atmosphere-front" aria-hidden="true" />
+      <div className="scene-ambient" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, index) => <span key={index} />)}
+      </div>
       <div className="scene-stage-content">{children}</div>
     </div>
   );

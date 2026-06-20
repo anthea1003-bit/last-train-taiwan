@@ -1,4 +1,11 @@
-import { GameState, Choice, Challenge, Ending, SaveEnvelope } from './types';
+import {
+  GameState,
+  Choice,
+  Challenge,
+  Ending,
+  SaveEnvelope,
+  ChoiceRewardSummary
+} from './types';
 import { REGIONS, REGION_SEQUENCE } from '../content/regions';
 
 // 遊戲當前支援的存檔版本
@@ -194,6 +201,31 @@ export function reconcilePenghuRoute(state: GameState): GameState {
     currentEventId: selectEventForRegion('penghu', state.seed, state.stepIndex),
     isCompleted: false,
     selectedEnding: null
+  };
+}
+
+export function getChoiceRewardSummary(
+  previousState: GameState,
+  choice: Choice,
+  nextState: GameState
+): ChoiceRewardSummary {
+  const completedRegionId = previousState.currentRegionId;
+
+  return {
+    memory: Boolean(
+      choice.givesMemory
+      && nextState.memoryFragments > previousState.memoryFragments
+    ),
+    secretTicket: Boolean(
+      choice.givesSecretTicket
+      && !previousState.secretTicket
+      && nextState.secretTicket
+    ),
+    stamp: !previousState.ticketStamps.includes(completedRegionId)
+      && nextState.ticketStamps.includes(completedRegionId),
+    completedRegionId,
+    penghuUnlocked: completedRegionId !== 'penghu'
+      && nextState.currentRegionId === 'penghu'
   };
 }
 

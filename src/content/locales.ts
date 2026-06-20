@@ -87,6 +87,16 @@ export const LOCALES: Record<Language, Record<string, string>> = {
     'arrival_previous_result': '上一站留下的回聲',
     'arrival_view_ending': '前往終點月台',
     'arrival_final_destination': '破曉終點站',
+    'reward_title': '車票新增紀錄',
+    'reward_stamp': '鐵道印章',
+    'reward_memory': '記憶碎片',
+    'reward_secret_ticket': '秘密車票',
+    'reward_penghu_route': '第七站航線顯現',
+    'ticket_flip_label': '翻看車票背面',
+    'ticket_reverse_kicker': '票背暗紋 · 隱藏路線',
+    'ticket_reverse_locked': '墨跡仍在沉睡',
+    'ticket_reverse_unlocked': '澎湖航線已顯現',
+    'ticket_reverse_desc': '每一枚印章都在票背留下軌跡。當約定完整，最後一段航線會以金色浮現。',
 
     // 區域名稱
     'region_north_name': '北部：九份與平溪線',
@@ -302,6 +312,16 @@ export const LOCALES: Record<Language, Record<string, string>> = {
     'arrival_previous_result': 'Echo from the previous station',
     'arrival_view_ending': 'Enter the final platform',
     'arrival_final_destination': 'The Dawn Terminus',
+    'reward_title': 'New Ticket Records',
+    'reward_stamp': 'Railway Stamp',
+    'reward_memory': 'Memory Fragment',
+    'reward_secret_ticket': 'Secret Ticket',
+    'reward_penghu_route': 'Station Seven Route Revealed',
+    'ticket_flip_label': 'Turn the ticket over',
+    'ticket_reverse_kicker': 'Reverse watermark · hidden route',
+    'ticket_reverse_locked': 'The ink is still sleeping',
+    'ticket_reverse_unlocked': 'The Penghu route is visible',
+    'ticket_reverse_desc': 'Every stamp leaves a trace on the reverse. When the promise is complete, the final route appears in gold.',
 
     // Region Names
     'region_north_name': 'North: Jiufen & Pingxi Line',

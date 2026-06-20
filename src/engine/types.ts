@@ -60,6 +60,14 @@ export interface GameState {
   stepIndex: number; // 用於事件確定的步驟索引
 }
 
+export interface ChoiceRewardSummary {
+  memory: boolean;
+  secretTicket: boolean;
+  stamp: boolean;
+  completedRegionId: string;
+  penghuUnlocked: boolean;
+}
+
 export interface SaveEnvelope {
   version: number;
   updatedAt: string;

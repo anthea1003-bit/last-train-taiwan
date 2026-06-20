@@ -19,6 +19,7 @@ export default function App() {
     reducedMotion,
     wrongConsequence,
     successConsequence,
+    successReward,
     setLanguage,
     setReducedMotion,
     startNewGame,
@@ -119,9 +120,17 @@ export default function App() {
         )}
 
         {phase === 'playing' && state && currentEvent && (
-          <SceneStage image={currentScene} reducedMotion={reducedMotion}>
+          <SceneStage
+            image={currentScene}
+            regionId={state.currentRegionId}
+            reducedMotion={reducedMotion}
+          >
             <div className="game-layout">
-              <TicketStatus state={state} language={language} />
+              <TicketStatus
+                state={state}
+                language={language}
+                reducedMotion={reducedMotion}
+              />
               <div className="game-grid">
                 <aside className="journey-sidebar">
                   <RouteMap state={state} language={language} />
@@ -154,6 +163,8 @@ export default function App() {
             language={language}
             onContinue={dismissInterlude}
             reducedMotion={reducedMotion}
+            reward={successReward}
+            destinationRegionId={state.currentRegionId}
           />
         )}
 

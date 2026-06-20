@@ -1598,3 +1598,681 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Watercolor depth theatre */
+.scene-art-back {
+  z-index: -6;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  opacity: 0.72;
+  filter: blur(15px) saturate(0.82) brightness(0.58);
+  transform: translate3d(
+    calc(var(--scene-bg-x) * 0.35),
+    calc(var(--scene-bg-y) * 0.35),
+    -130px
+  ) scale(1.18);
+  animation: scene-back-breathe 24s ease-in-out infinite alternate;
+}
+
+.scene-art-main {
+  z-index: -5;
+}
+
+.scene-art-front {
+  z-index: -3;
+  opacity: 0.58;
+  filter: contrast(1.04) saturate(1.08);
+  mask-image: linear-gradient(to bottom, transparent 28%, rgba(0, 0, 0, 0.08) 48%, #000 82%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 28%, rgba(0, 0, 0, 0.08) 48%, #000 82%);
+  transform: translate3d(
+    calc(var(--scene-bg-x) * -0.55),
+    calc(var(--scene-bg-y) * -0.42),
+    75px
+  ) scale(1.075);
+  animation: scene-front-breathe 15s ease-in-out infinite alternate;
+}
+
+.scene-stage::after {
+  z-index: -2;
+}
+
+.scene-ambient {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateZ(110px);
+}
+
+.scene-ambient span {
+  --ambient-x: 10%;
+  --ambient-delay: 0s;
+  --ambient-scale: 1;
+  position: absolute;
+  left: var(--ambient-x);
+  opacity: 0;
+  animation-delay: var(--ambient-delay) !important;
+  transform: scale(var(--ambient-scale));
+  will-change: transform, opacity;
+}
+
+.scene-ambient span:nth-child(1) { --ambient-x: 5%; --ambient-delay: -2s; --ambient-scale: 0.7; }
+.scene-ambient span:nth-child(2) { --ambient-x: 14%; --ambient-delay: -8s; --ambient-scale: 1.15; }
+.scene-ambient span:nth-child(3) { --ambient-x: 24%; --ambient-delay: -5s; --ambient-scale: 0.82; }
+.scene-ambient span:nth-child(4) { --ambient-x: 35%; --ambient-delay: -11s; --ambient-scale: 1.35; }
+.scene-ambient span:nth-child(5) { --ambient-x: 44%; --ambient-delay: -4s; --ambient-scale: 0.62; }
+.scene-ambient span:nth-child(6) { --ambient-x: 53%; --ambient-delay: -13s; --ambient-scale: 1.05; }
+.scene-ambient span:nth-child(7) { --ambient-x: 62%; --ambient-delay: -7s; --ambient-scale: 0.76; }
+.scene-ambient span:nth-child(8) { --ambient-x: 71%; --ambient-delay: -1s; --ambient-scale: 1.25; }
+.scene-ambient span:nth-child(9) { --ambient-x: 79%; --ambient-delay: -10s; --ambient-scale: 0.68; }
+.scene-ambient span:nth-child(10) { --ambient-x: 86%; --ambient-delay: -6s; --ambient-scale: 1; }
+.scene-ambient span:nth-child(11) { --ambient-x: 93%; --ambient-delay: -14s; --ambient-scale: 0.84; }
+.scene-ambient span:nth-child(12) { --ambient-x: 98%; --ambient-delay: -3s; --ambient-scale: 1.2; }
+
+.scene-north .scene-ambient span {
+  bottom: -30px;
+  width: 10px;
+  height: 14px;
+  background: #f6bd58;
+  border-radius: 5px 5px 3px 3px;
+  box-shadow: 0 0 11px #ffd993, 0 0 26px rgba(246, 189, 88, 0.58);
+  animation: lantern-drift 16s linear infinite;
+}
+
+.scene-north .scene-ambient span::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 229, 178, 0.56);
+}
+
+.scene-hsinchu_miaoli .scene-ambient span {
+  top: -20px;
+  width: 9px;
+  height: 17px;
+  background: rgba(185, 210, 124, 0.76);
+  border-radius: 90% 8% 90% 8%;
+  box-shadow: 0 0 10px rgba(185, 210, 124, 0.28);
+  animation: leaf-fall 13s ease-in infinite;
+}
+
+.scene-central .scene-ambient span {
+  bottom: calc(4% + (var(--ambient-scale) * 26px));
+  width: 90px;
+  height: 22px;
+  margin-left: -45px;
+  border: 1px solid rgba(204, 235, 236, 0.52);
+  border-radius: 50%;
+  animation: lake-ripple 7s ease-out infinite;
+}
+
+.scene-south_west .scene-ambient span {
+  bottom: -16px;
+  width: 5px;
+  height: 13px;
+  background: rgba(255, 174, 86, 0.82);
+  box-shadow: 0 0 12px rgba(255, 128, 62, 0.62);
+  animation: old-city-ember 10s ease-in infinite;
+}
+
+.scene-kaohsiung_pingtung .scene-ambient span {
+  top: calc(30% + (var(--ambient-scale) * 20px));
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffe28a;
+  box-shadow: 0 0 9px #ffdb6b, 0 0 28px rgba(74, 209, 225, 0.52);
+  animation: harbor-light 5s ease-in-out infinite;
+}
+
+.scene-east .scene-ambient span {
+  top: -24vh;
+  width: 2px;
+  height: 22vh;
+  background: linear-gradient(to bottom, transparent, rgba(222, 242, 239, 0.38), transparent);
+  filter: blur(1px);
+  transform: rotate(12deg);
+  animation: gorge-mist-fall 9s linear infinite;
+}
+
+.scene-penghu .scene-ambient span {
+  bottom: -8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff2bc;
+  box-shadow: 0 0 10px #ffe998, 0 0 22px rgba(116, 226, 231, 0.72);
+  animation: star-sand-rise 9s ease-out infinite;
+}
+
+/* Interactive 3D railway ticket */
+.ticket-status-shell {
+  --ticket-tilt-x: 0deg;
+  --ticket-tilt-y: 0deg;
+  position: relative;
+  width: min(1480px, 100%);
+  min-height: 84px;
+  margin-inline: auto;
+  perspective: 1200px;
+  transform: translateZ(26px);
+}
+
+.ticket-3d {
+  position: relative;
+  min-height: inherit;
+  transform-style: preserve-3d;
+  transform:
+    rotateX(var(--ticket-tilt-x))
+    rotateY(var(--ticket-tilt-y));
+  transition: transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.ticket-status-shell.is-flipped .ticket-3d {
+  transform: rotateY(180deg);
+}
+
+.ticket-face.ticket-status {
+  width: 100%;
+  min-height: 84px;
+  margin: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: none;
+}
+
+.ticket-front {
+  position: relative;
+  overflow: hidden;
+}
+
+.ticket-back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(190px, 0.8fr) minmax(260px, 1.4fr) minmax(220px, 1fr);
+  align-items: center;
+  gap: 24px;
+  transform: rotateY(180deg) !important;
+  background:
+    linear-gradient(104deg, transparent 0 42%, rgba(181, 139, 53, 0.08) 42.5% 43%, transparent 43.5%),
+    repeating-linear-gradient(0deg, rgba(24, 51, 46, 0.025) 0 1px, transparent 1px 4px),
+    var(--ticket-cream);
+}
+
+.ticket-back-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.ticket-back-copy small,
+.ticket-back-copy span {
+  color: rgba(23, 35, 43, 0.56);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ticket-back-copy strong {
+  color: var(--railway-green);
+  font-family: var(--font-serif);
+  font-size: 18px;
+}
+
+.ticket-back p {
+  margin: 0;
+  color: rgba(23, 35, 43, 0.66);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.ticket-route-line {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ticket-route-line::before {
+  content: "";
+  position: absolute;
+  right: 5%;
+  left: 5%;
+  height: 2px;
+  background: rgba(31, 77, 68, 0.25);
+}
+
+.ticket-route-line i {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  background: var(--ticket-cream);
+  border: 2px solid rgba(31, 77, 68, 0.4);
+  border-radius: 50%;
+}
+
+.ticket-route-line i.is-lit {
+  background: var(--railway-green);
+  border-color: var(--railway-green);
+  box-shadow: 0 0 0 4px rgba(31, 77, 68, 0.1);
+}
+
+.ticket-route-line i:last-child {
+  border-color: #b88a32;
+}
+
+.ticket-status-shell.has-hidden-route .ticket-route-line::before {
+  background: linear-gradient(90deg, var(--railway-green), #d4a84e);
+}
+
+.ticket-status-shell.has-hidden-route .ticket-route-line i:last-child {
+  background: #d4a84e;
+  box-shadow: 0 0 0 5px rgba(212, 168, 78, 0.16), 0 0 18px rgba(212, 168, 78, 0.55);
+  animation: hidden-stop-pulse 2.4s ease-in-out infinite;
+}
+
+.ticket-gold-route {
+  position: absolute;
+  right: -8%;
+  bottom: 10px;
+  width: 44%;
+  height: 2px;
+  opacity: 0.72;
+  background: linear-gradient(90deg, transparent, #d7a94b 24%, #fff0a8 54%, transparent);
+  box-shadow: 0 0 13px rgba(215, 169, 75, 0.7);
+  transform: rotate(-7deg);
+  animation: gold-route-shimmer 3.8s ease-in-out infinite;
+}
+
+.ticket-flip-button {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  right: -10px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--ticket-cream);
+  background: var(--railway-green);
+  border: 2px solid rgba(245, 239, 217, 0.86);
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  font-size: 17px;
+  transform: translateY(-50%);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.ticket-flip-button:hover {
+  background: #2f6559;
+  transform: translateY(-50%) rotate(24deg) scale(1.06);
+}
+
+/* Train window transition and reward theatre */
+.rail-speed-lines {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.rail-speed-lines span {
+  position: absolute;
+  left: -40vw;
+  width: clamp(120px, 24vw, 380px);
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 239, 196, 0.76), transparent);
+  animation: rail-light-pass 1.7s linear infinite;
+}
+
+.rail-speed-lines span:nth-child(1) { top: 12%; animation-delay: -0.2s; }
+.rail-speed-lines span:nth-child(2) { top: 21%; animation-delay: -1.1s; }
+.rail-speed-lines span:nth-child(3) { top: 31%; animation-delay: -0.6s; }
+.rail-speed-lines span:nth-child(4) { top: 39%; animation-delay: -1.4s; }
+.rail-speed-lines span:nth-child(5) { top: 52%; animation-delay: -0.9s; }
+.rail-speed-lines span:nth-child(6) { top: 61%; animation-delay: -0.1s; }
+.rail-speed-lines span:nth-child(7) { top: 69%; animation-delay: -1.3s; }
+.rail-speed-lines span:nth-child(8) { top: 77%; animation-delay: -0.5s; }
+.rail-speed-lines span:nth-child(9) { top: 85%; animation-delay: -1.6s; }
+.rail-speed-lines span:nth-child(10) { top: 92%; animation-delay: -0.8s; }
+
+.reward-reveal {
+  margin-top: 16px;
+  padding: 12px 14px 14px;
+  overflow: hidden;
+  background: rgba(6, 24, 31, 0.58);
+  border: 1px solid rgba(240, 188, 102, 0.28);
+}
+
+.reward-reveal > small {
+  color: rgba(255, 253, 246, 0.48);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.reward-items {
+  margin-top: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reward-item {
+  min-height: 42px;
+  padding: 6px 10px 6px 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 253, 246, 0.86);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  animation: reward-card-in 720ms cubic-bezier(0.18, 0.72, 0.18, 1) both;
+}
+
+.reward-item:nth-child(2) { animation-delay: 180ms; }
+.reward-item:nth-child(3) { animation-delay: 360ms; }
+.reward-item:nth-child(4) { animation-delay: 540ms; }
+
+.reward-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--night);
+  background: var(--lamp-gold);
+  border-radius: 50%;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.reward-item strong {
+  max-width: 190px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.reward-stamp .reward-icon {
+  color: #a33f31;
+  background: #f4dfb6;
+  border: 2px solid #b64b3b;
+  border-radius: 4px;
+  animation: stamp-impact 820ms 120ms cubic-bezier(0.2, 0.75, 0.25, 1.35) both;
+}
+
+.reward-memory .reward-icon {
+  color: #e6fbff;
+  background: linear-gradient(145deg, #4f9aa1, #b9eef0);
+  border-radius: 5px 60% 5px 60%;
+  box-shadow: 0 0 18px rgba(125, 230, 235, 0.55);
+  animation: memory-glint 2.2s ease-in-out infinite;
+}
+
+.reward-secret-ticket {
+  border-color: rgba(240, 188, 102, 0.56);
+}
+
+.reward-secret-ticket .reward-icon {
+  width: 42px;
+  border-radius: 3px;
+  background: #f4e8be;
+  border: 1px solid #bc8936;
+  animation: secret-ticket-flip 1.15s 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.reward-penghu {
+  background: rgba(212, 168, 78, 0.14);
+  border-color: rgba(255, 229, 146, 0.7);
+  box-shadow: inset 0 0 20px rgba(212, 168, 78, 0.12);
+}
+
+.reward-penghu .reward-icon {
+  box-shadow: 0 0 0 4px rgba(240, 188, 102, 0.12), 0 0 24px rgba(240, 188, 102, 0.62);
+  animation: hidden-stop-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes scene-back-breathe {
+  from {
+    transform: translate3d(
+      calc(var(--scene-bg-x) * 0.35),
+      calc(var(--scene-bg-y) * 0.35),
+      -130px
+    ) scale(1.18);
+  }
+  to {
+    transform: translate3d(
+      calc(var(--scene-bg-x) * 0.35),
+      calc(var(--scene-bg-y) * 0.35),
+      -130px
+    ) scale(1.24);
+  }
+}
+
+@keyframes scene-front-breathe {
+  from {
+    transform: translate3d(
+      calc(var(--scene-bg-x) * -0.55),
+      calc(var(--scene-bg-y) * -0.42),
+      75px
+    ) scale(1.075);
+  }
+  to {
+    transform: translate3d(
+      calc(var(--scene-bg-x) * -0.55),
+      calc(var(--scene-bg-y) * -0.42),
+      75px
+    ) scale(1.115);
+  }
+}
+
+@keyframes lantern-drift {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(var(--ambient-scale)); }
+  12% { opacity: 0.72; }
+  100% { opacity: 0; transform: translate3d(8vw, -112vh, 0) scale(calc(var(--ambient-scale) * 1.2)); }
+}
+
+@keyframes leaf-fall {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg) scale(var(--ambient-scale)); }
+  14% { opacity: 0.65; }
+  100% { opacity: 0; transform: translate3d(18vw, 112vh, 0) rotate(680deg) scale(var(--ambient-scale)); }
+}
+
+@keyframes lake-ripple {
+  0% { opacity: 0; transform: scale(0.2); }
+  18% { opacity: 0.48; }
+  100% { opacity: 0; transform: scale(calc(var(--ambient-scale) * 2.8)); }
+}
+
+@keyframes old-city-ember {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+  18% { opacity: 0.7; }
+  100% { opacity: 0; transform: translate3d(-8vw, -82vh, 0) rotate(240deg); }
+}
+
+@keyframes harbor-light {
+  0%, 100% { opacity: 0.15; transform: scale(calc(var(--ambient-scale) * 0.72)); }
+  45% { opacity: 0.78; transform: scale(calc(var(--ambient-scale) * 1.18)); }
+}
+
+@keyframes gorge-mist-fall {
+  0% { opacity: 0; transform: translate3d(0, -20vh, 0) rotate(12deg); }
+  16% { opacity: 0.36; }
+  100% { opacity: 0; transform: translate3d(-12vw, 130vh, 0) rotate(12deg); }
+}
+
+@keyframes star-sand-rise {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.3); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate3d(4vw, -76vh, 0) scale(calc(var(--ambient-scale) * 1.5)); }
+}
+
+@keyframes hidden-stop-pulse {
+  0%, 100% { transform: scale(0.9); filter: brightness(0.9); }
+  50% { transform: scale(1.14); filter: brightness(1.3); }
+}
+
+@keyframes gold-route-shimmer {
+  0%, 100% { opacity: 0.34; transform: rotate(-7deg) translateX(-5%); }
+  50% { opacity: 0.9; transform: rotate(-7deg) translateX(8%); }
+}
+
+@keyframes rail-light-pass {
+  0% { opacity: 0; transform: translateX(0) scaleX(0.6); }
+  15% { opacity: 0.52; }
+  100% { opacity: 0; transform: translateX(150vw) scaleX(1.8); }
+}
+
+@keyframes reward-card-in {
+  from { opacity: 0; transform: translate3d(0, 16px, 40px) scale(0.92); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes stamp-impact {
+  0% { opacity: 0; transform: translate3d(0, -36px, 80px) rotate(-16deg) scale(1.8); }
+  58% { opacity: 1; transform: translate3d(0, 3px, 0) rotate(3deg) scale(0.88); }
+  100% { transform: translate3d(0, 0, 0) rotate(-2deg) scale(1); }
+}
+
+@keyframes memory-glint {
+  0%, 100% { transform: rotate(0deg) scale(0.94); filter: brightness(0.9); }
+  50% { transform: rotate(12deg) scale(1.08); filter: brightness(1.35); }
+}
+
+@keyframes secret-ticket-flip {
+  0% { opacity: 0; transform: perspective(300px) rotateY(90deg) scale(0.72); }
+  100% { opacity: 1; transform: perspective(300px) rotateY(0deg) scale(1); }
+}
+
+@media (max-width: 820px) {
+  .ticket-status-shell,
+  .ticket-3d {
+    min-height: 154px;
+  }
+
+  .ticket-face.ticket-status {
+    min-height: 154px;
+  }
+
+  .ticket-back {
+    grid-template-columns: 1fr 1.2fr;
+  }
+
+  .ticket-back p {
+    display: none;
+  }
+
+  .ticket-flip-button {
+    right: 5px;
+  }
+
+  .scene-art-front {
+    opacity: 0.42;
+  }
+}
+
+@media (max-width: 560px) {
+  .scene-ambient span:nth-child(even) {
+    display: none;
+  }
+
+  .ticket-status-shell,
+  .ticket-3d,
+  .ticket-face.ticket-status {
+    min-height: 170px;
+  }
+
+  .ticket-back {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 16px;
+    padding: 20px 28px 20px 18px;
+  }
+
+  .ticket-back-copy {
+    padding-right: 24px;
+  }
+
+  .ticket-route-line {
+    width: calc(100% - 18px);
+  }
+
+  .ticket-flip-button {
+    top: 22px;
+    right: 7px;
+    transform: none;
+  }
+
+  .ticket-flip-button:hover {
+    transform: rotate(24deg);
+  }
+
+  .arrival-copy {
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+
+  .reward-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reward-item {
+    padding-right: 7px;
+  }
+
+  .reward-item strong {
+    font-size: 9px;
+  }
+
+  .rail-speed-lines span:nth-child(even) {
+    display: none;
+  }
+}
+
+.scene-stage.is-reduced-motion .scene-art-back,
+.scene-stage.is-reduced-motion .scene-art-main,
+.scene-stage.is-reduced-motion .scene-art-front,
+.scene-stage.is-reduced-motion .scene-ambient span,
+.arrival-transition.is-reduced-motion .rail-speed-lines span,
+.arrival-transition.is-reduced-motion .reward-item,
+.arrival-transition.is-reduced-motion .reward-icon {
+  animation: none !important;
+}
+
+.scene-stage.is-reduced-motion .scene-art-back,
+.scene-stage.is-reduced-motion .scene-art-front {
+  display: none;
+}
+
+.scene-stage.is-reduced-motion .scene-ambient,
+.arrival-transition.is-reduced-motion .rail-speed-lines {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-art-back,
+  .scene-art-main,
+  .scene-art-front,
+  .scene-ambient span,
+  .ticket-gold-route,
+  .ticket-route-line i,
+  .rail-speed-lines span,
+  .reward-item,
+  .reward-icon {
+    animation: none !important;
+  }
+}

@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
-import { GameState, Choice, Language } from '../engine/types';
+import {
+  GameState,
+  Choice,
+  Language,
+  ChoiceRewardSummary
+} from '../engine/types';
 import {
   initGame,
   applyChoice,
   serializeSave,
-  migrateSave
+  migrateSave,
+  getChoiceRewardSummary
 } from '../engine/game';
 import { REGIONS } from '../content/regions';
 
@@ -29,6 +35,7 @@ export function useGameState() {
 
   // 當前答對或決策後的 Consequence (進入 interlude 時展示)
   const [successConsequence, setSuccessConsequence] = useState<string | null>(null);
+  const [successReward, setSuccessReward] = useState<ChoiceRewardSummary | null>(null);
 
   // 初始化載入語系、Reduced Motion 設定與檢查存檔狀態
   useEffect(() => {
@@ -78,6 +85,7 @@ export function useGameState() {
     setPhase('playing');
     setWrongConsequence(null);
     setSuccessConsequence(null);
+    setSuccessReward(null);
     setIsSaveCorrupted(false);
     localStorage.setItem(SAVE_KEY, serializeSave(newState));
   };
@@ -91,6 +99,7 @@ export function useGameState() {
       setState(restored);
       setWrongConsequence(null);
       setSuccessConsequence(null);
+      setSuccessReward(null);
       // migrateSave 也會校正三項條件齊全、卻誤停在普通結局的舊狀態。
       localStorage.setItem(SAVE_KEY, serializeSave(restored));
       if (restored.isCompleted) {
@@ -136,6 +145,7 @@ export function useGameState() {
       // 我們不直接變更畫面為 nextState，而是先把 state 更新，但把畫面切入 interlude 階段
       // 在 interlude 階段，我們展示此 choice 的 consequenceTextId
       setSuccessConsequence(choice.consequenceTextId);
+      setSuccessReward(getChoiceRewardSummary(state, choice, nextState));
       setState(nextState);
       setWrongConsequence(null);
       setPhase('interlude');
@@ -148,6 +158,7 @@ export function useGameState() {
   const dismissInterlude = () => {
     if (!state) return;
     setSuccessConsequence(null);
+    setSuccessReward(null);
     if (state.isCompleted) {
       setPhase('ending');
     } else {
@@ -169,6 +180,7 @@ export function useGameState() {
     setPhase('title');
     setWrongConsequence(null);
     setSuccessConsequence(null);
+    setSuccessReward(null);
   };
 
   // 毀損存檔的 Fresh Start
@@ -193,6 +205,7 @@ export function useGameState() {
     isSaveCorrupted,
     wrongConsequence,
     successConsequence,
+    successReward,
     setLanguage: changeLanguage,
     setReducedMotion: changeReducedMotion,
     startNewGame,

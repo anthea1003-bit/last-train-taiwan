@@ -11,7 +11,8 @@ import {
   getPreferredChoiceId,
   getScenarioModifier,
   isChoiceAccepted,
-  reconcilePenghuRoute
+  reconcilePenghuRoute,
+  getChoiceRewardSummary
 } from './game';
 import { Choice } from './types';
 import { REGIONS, REGION_SEQUENCE } from '../content/regions';
@@ -152,6 +153,31 @@ describe('遊戲引擎測試 - 最後一班不存在的環島列車', () => {
     expect(nextState.memoryFragments).toBe(1);
     expect(nextState.ticketStamps).toContain('north');
     expect(nextState.currentRegionId).toBe('hsinchu_miaoli');
+  });
+
+  it('應產生與實際結算一致的過關獎勵摘要', () => {
+    const state = {
+      ...initGame('reward-animation'),
+      currentEventId: 'north_event_2'
+    };
+    const choice = REGIONS[0].events[1].challenge.choices.find(
+      ({ id }) => id === 'north_c2_option_a'
+    );
+
+    if (!choice) {
+      throw new Error('找不到秘密車票選項');
+    }
+
+    const nextState = applyChoice(state, choice);
+    const reward = getChoiceRewardSummary(state, choice, nextState);
+
+    expect(reward).toEqual({
+      memory: true,
+      secretTicket: true,
+      stamp: true,
+      completedRegionId: 'north',
+      penghuUnlocked: false
+    });
   });
 
   it('有標準答案的異常題仍只接受正確選項', () => {
