@@ -40,7 +40,7 @@ export default function App() {
     : null;
   const currentScene = state
     ? getSceneImage(state.currentRegionId)
-    : '/images/hero-night-train.webp';
+    : getSceneImage('hero');
 
   return (
     <div className="app-shell">
@@ -83,7 +83,7 @@ export default function App() {
           <section className="title-hero">
             <img
               className="title-hero-image"
-              src="/images/hero-night-train.webp"
+              src={getSceneImage('hero')}
               alt={language === 'zh-TW' ? '雨霧中行駛的阿里山森林列車' : 'A forest railway train traveling through rain and mist'}
             />
             <div className="title-hero-wash" />
@@ -158,7 +158,14 @@ export default function App() {
         )}
 
         {phase === 'ending' && state && (
-          <div className="centered-stage ending-stage">
+          <div
+            className="centered-stage ending-stage"
+            style={{
+              backgroundImage: `linear-gradient(rgba(5, 14, 20, 0.56), rgba(5, 14, 20, 0.8)), url("${getSceneImage(
+                state.selectedEnding === 'penghu-true' ? 'penghu' : 'hero'
+              )}")`
+            }}
+          >
             <EndingPanel
               state={state}
               language={language}

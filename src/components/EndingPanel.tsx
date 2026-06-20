@@ -1,5 +1,6 @@
 import { GameState, Language } from '../engine/types';
 import { translate } from '../content/locales';
+import { getSceneImage } from '../content/scene-images';
 import { determineAvailableEndings } from '../engine/game';
 
 interface EndingPanelProps {
@@ -110,8 +111,8 @@ export default function EndingPanel({
             <img
               src={
                 state.selectedEnding === 'penghu-true'
-                  ? '/images/penghu-seventh.webp'
-                  : '/images/hero-night-train.webp'
+                  ? getSceneImage('penghu')
+                  : getSceneImage('hero')
               }
               alt="Ending Scene"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}

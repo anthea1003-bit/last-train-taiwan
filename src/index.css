@@ -1253,9 +1253,8 @@ input:focus-visible {
   padding: 44px 20px;
   display: grid;
   place-items: center;
-  background:
-    linear-gradient(rgba(5, 14, 20, 0.56), rgba(5, 14, 20, 0.8)),
-    url("/images/hero-night-train.webp") center / cover;
+  background-position: center;
+  background-size: cover;
 }
 
 .centered-stage > * {

@@ -1,13 +1,18 @@
-export const SCENE_IMAGES: Record<string, string> = {
-  north: '/images/north-jiufen.webp',
-  hsinchu_miaoli: '/images/taoyuan-neiwan.webp',
-  central: '/images/central-sunmoon.webp',
-  south_west: '/images/southwest-tainan.webp',
-  kaohsiung_pingtung: '/images/kaohsiung-cijin.webp',
-  east: '/images/east-taroko.webp',
-  penghu: '/images/penghu-seventh.webp'
+const SCENE_FILES: Record<string, string> = {
+  north: 'north-jiufen.webp',
+  hsinchu_miaoli: 'taoyuan-neiwan.webp',
+  central: 'central-sunmoon.webp',
+  south_west: 'southwest-tainan.webp',
+  kaohsiung_pingtung: 'kaohsiung-cijin.webp',
+  east: 'east-taroko.webp',
+  penghu: 'penghu-seventh.webp'
 };
 
+export function getAssetUrl(path: string): string {
+  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+}
+
 export function getSceneImage(regionId: string): string {
-  return SCENE_IMAGES[regionId] ?? '/images/hero-night-train.webp';
+  const fileName = SCENE_FILES[regionId] ?? 'hero-night-train.webp';
+  return getAssetUrl(`images/${fileName}`);
 }
