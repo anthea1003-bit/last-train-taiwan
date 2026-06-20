@@ -173,11 +173,33 @@ describe('遊戲引擎測試 - 最後一班不存在的環島列車', () => {
 
     expect(reward).toEqual({
       memory: true,
+      memoryMissed: false,
       secretTicket: true,
       stamp: true,
       completedRegionId: 'north',
       penghuUnlocked: false
     });
+  });
+
+  it('選擇未喚醒記憶的路線時，獎勵摘要應明確標記本關未取得碎片', () => {
+    const state = {
+      ...initGame('missed-memory-animation'),
+      currentEventId: 'north_event_2'
+    };
+    const choice = REGIONS[0].events[1].challenge.choices.find(
+      ({ id }) => id === 'north_c2_option_b'
+    );
+
+    if (!choice) {
+      throw new Error('找不到未取得記憶的北部選項');
+    }
+
+    const nextState = applyChoice(state, choice);
+    const reward = getChoiceRewardSummary(state, choice, nextState);
+
+    expect(reward.memory).toBe(false);
+    expect(reward.memoryMissed).toBe(true);
+    expect(nextState.memoryFragments).toBe(0);
   });
 
   it('有標準答案的異常題仍只接受正確選項', () => {

@@ -62,6 +62,7 @@ export interface GameState {
 
 export interface ChoiceRewardSummary {
   memory: boolean;
+  memoryMissed: boolean;
   secretTicket: boolean;
   stamp: boolean;
   completedRegionId: string;

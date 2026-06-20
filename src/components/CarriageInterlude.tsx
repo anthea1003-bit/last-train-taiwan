@@ -34,6 +34,10 @@ export default function CarriageInterlude({
           type: 'memory',
           label: translate('reward_memory', language)
         },
+        reward.memoryMissed && {
+          type: 'memory-missed',
+          label: translate('reward_memory_missed', language)
+        },
         reward.secretTicket && {
           type: 'secret-ticket',
           label: translate('reward_secret_ticket', language)
@@ -91,6 +95,7 @@ export default function CarriageInterlude({
                   <span className="reward-icon" aria-hidden="true">
                     {item.type === 'stamp' && '印'}
                     {item.type === 'memory' && '◇'}
+                    {item.type === 'memory-missed' && '缺'}
                     {item.type === 'secret-ticket' && '券'}
                     {item.type === 'penghu' && '七'}
                   </span>

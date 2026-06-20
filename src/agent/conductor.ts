@@ -61,6 +61,14 @@ function createHint(
   language: Language,
   turnIndex: number
 ): string {
+  const hasMemoryTradeoff = challenge.choices.some((choice) => choice.givesMemory)
+    && challenge.choices.some((choice) => !choice.givesMemory);
+  const memoryGuidance = hasMemoryTradeoff
+    ? language === 'zh-TW'
+      ? ' 若你同時在找記憶碎片，留意哪個行動真正碰觸了人物的失物、約定或地方記憶；單純節省資源不一定會喚醒它。'
+      : ' If you are also seeking a memory fragment, notice which action truly touches a person’s lost object, promise, or local memory; saving resources alone may not awaken it.'
+    : '';
+
   if (challenge.correctChoiceId) {
     const variants = language === 'zh-TW'
       ? [
@@ -71,7 +79,7 @@ function createHint(
         `I will not name the answer. Ask which action repairs the broken rule instead of treating its surface. The conductor's log adds: ${translate(challenge.hintTextId, language)}`,
         `Try another angle: both plans have a cost, but only one responds after understanding the anomaly. Eliminate the action that merely creates more disorder. Additional clue: ${translate(challenge.hintTextId, language)}`
       ];
-    return variants[turnIndex % variants.length];
+    return `${variants[turnIndex % variants.length]}${memoryGuidance}`;
   }
 
   const modifier = getScenarioModifier(state, challenge);
@@ -91,11 +99,12 @@ function createHint(
   };
 
   if (turnIndex % 2 === 0) {
-    return hints[modifier];
+    return `${hints[modifier]}${memoryGuidance}`;
   }
-  return language === 'zh-TW'
+  const resourceHint = language === 'zh-TW'
     ? `${hints[modifier]} 你目前有 ${state.time} 小時與 NT$ ${state.fare}，把這兩個數字一起放進判斷，不要只看故事表面。`
     : `${hints[modifier]} You have ${state.time} hours and NT$ ${state.fare}; include both numbers in your reasoning instead of reading only the story surface.`;
+  return `${resourceHint}${memoryGuidance}`;
 }
 
 export function createConductorReply({

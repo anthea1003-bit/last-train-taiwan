@@ -216,6 +216,9 @@ export function getChoiceRewardSummary(
       choice.givesMemory
       && nextState.memoryFragments > previousState.memoryFragments
     ),
+    memoryMissed: previousState.currentRegionId !== 'penghu'
+      && previousState.memoryFragments < 6
+      && nextState.memoryFragments === previousState.memoryFragments,
     secretTicket: Boolean(
       choice.givesSecretTicket
       && !previousState.secretTicket

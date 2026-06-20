@@ -38,6 +38,22 @@ describe('車長 Agent', () => {
     expect(reply.text.length).toBeGreaterThan(20);
   });
 
+  it('關卡存在記憶碎片取捨時，提示會說明喚醒記憶的判斷方向', () => {
+    const state = initGame('agent-memory-guidance');
+    const reply = createConductorReply({
+      input: '給我提示',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.text).toContain('記憶碎片');
+    expect(reply.text).toContain('人物');
+    for (const choice of challenge.choices) {
+      expect(reply.text).not.toContain(translate(choice.textId, 'zh-TW'));
+    }
+  });
+
   it('英文輸入可以取得英文地點回覆', () => {
     const state = initGame('agent-location');
     const reply = createConductorReply({
