@@ -180,6 +180,23 @@ export function checkTrueEndingEligibility(state: GameState): boolean {
   return hasSixStamps && state.memoryFragments === 6 && state.secretTicket;
 }
 
+export function reconcilePenghuRoute(state: GameState): GameState {
+  const hasAlreadyReachedPenghu = state.currentRegionId === 'penghu'
+    || state.history.includes('penghu');
+
+  if (!checkTrueEndingEligibility(state) || hasAlreadyReachedPenghu) {
+    return state;
+  }
+
+  return {
+    ...state,
+    currentRegionId: 'penghu',
+    currentEventId: selectEventForRegion('penghu', state.seed, state.stepIndex),
+    isCompleted: false,
+    selectedEnding: null
+  };
+}
+
 /**
  * 套用選擇並執行資源 Clamping、收集線索、獲得記憶與車票等遊戲邏輯
  */
@@ -372,11 +389,11 @@ export function migrateSave(serialized: string): GameState | null {
         seed: oldState.seed || 'default-seed',
         stepIndex: typeof oldState.stepIndex === 'number' ? oldState.stepIndex : 0
       };
-      return migratedState;
+      return reconcilePenghuRoute(migratedState);
     }
     
     if (version === CURRENT_SAVE_VERSION) {
-      return envelope.state;
+      return reconcilePenghuRoute(envelope.state);
     }
     
     return null;

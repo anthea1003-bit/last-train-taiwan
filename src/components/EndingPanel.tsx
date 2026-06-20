@@ -17,6 +17,25 @@ export default function EndingPanel({
   onRestart
 }: EndingPanelProps) {
   const availableEndings = determineAvailableEndings(state);
+  const penghuRequirements = [
+    {
+      label: translate('secret_ticket_active', language),
+      value: state.secretTicket
+        ? translate('ending_requirement_met', language)
+        : translate('ending_requirement_missing', language),
+      met: state.secretTicket
+    },
+    {
+      label: translate('label_stamps', language),
+      value: `${state.ticketStamps.length} / 6`,
+      met: state.ticketStamps.length === 6
+    },
+    {
+      label: translate('label_memories', language),
+      value: `${state.memoryFragments} / 6`,
+      met: state.memoryFragments === 6
+    }
+  ];
 
   return (
     <div
@@ -54,6 +73,49 @@ export default function EndingPanel({
           <p style={{ lineHeight: '1.6', color: 'var(--color-text-dark)', textAlign: 'center' }}>
             {translate('ending_selection_desc', language)}
           </p>
+
+          {!state.history.includes('penghu') && (
+            <section
+              aria-label={translate('ending_penghu_locked_title', language)}
+              style={{
+                border: '1px solid rgba(15, 76, 68, 0.35)',
+                backgroundColor: 'rgba(15, 76, 68, 0.06)',
+                padding: '1rem',
+                borderRadius: '6px'
+              }}
+            >
+              <strong style={{ color: 'var(--color-railway-green)' }}>
+                {translate('ending_penghu_locked_title', language)}
+              </strong>
+              <p style={{ margin: '0.45rem 0 0.8rem', lineHeight: '1.5', color: '#445' }}>
+                {translate('ending_penghu_locked_desc', language)}
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: '0.5rem'
+                }}
+              >
+                {penghuRequirements.map((requirement) => (
+                  <div
+                    key={requirement.label}
+                    style={{
+                      backgroundColor: '#FFF',
+                      border: `1px solid ${requirement.met ? 'var(--color-railway-green)' : 'var(--color-coral)'}`,
+                      borderRadius: '4px',
+                      padding: '0.65rem'
+                    }}
+                  >
+                    <small style={{ display: 'block', color: '#667' }}>{requirement.label}</small>
+                    <strong style={{ color: requirement.met ? 'var(--color-railway-green)' : 'var(--color-coral)' }}>
+                      {requirement.value}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {availableEndings.map((ending) => (

@@ -10,7 +10,8 @@ import {
   getOrderedChoices,
   getPreferredChoiceId,
   getScenarioModifier,
-  isChoiceAccepted
+  isChoiceAccepted,
+  reconcilePenghuRoute
 } from './game';
 import { Choice } from './types';
 import { REGIONS, REGION_SEQUENCE } from '../content/regions';
@@ -255,6 +256,93 @@ describe('遊戲引擎測試 - 最後一班不存在的環島列車', () => {
     const endings = determineAvailableEndings(state);
     expect(endings.length).toBe(1);
     expect(endings[0].id).toBe('penghu-true');
+  });
+
+  it('真實六站內容中，秘密車票、六枚印章與六片記憶會導向澎湖', () => {
+    let state = initGame('train7');
+
+    expect(state.currentEventId).toBe('north_event_2');
+
+    for (let index = 0; index < REGION_SEQUENCE.length; index += 1) {
+      const region = REGIONS.find(({ id }) => id === state.currentRegionId);
+      const event = region?.events.find(({ id }) => id === state.currentEventId);
+      const choice = index === 0
+        ? event?.challenge.choices.find(({ id }) => id === 'north_c2_option_a')
+        : event?.challenge.choices.find(({ givesMemory }) => givesMemory);
+
+      if (!event || !choice) {
+        throw new Error(`第 ${index + 1} 站缺少可取得記憶的真實選項`);
+      }
+
+      expect(isChoiceAccepted(event.challenge, choice.id)).toBe(true);
+      state = applyChoice(state, choice);
+    }
+
+    expect(state.secretTicket).toBe(true);
+    expect(state.memoryFragments).toBe(6);
+    expect(state.ticketStamps).toEqual(REGION_SEQUENCE);
+    expect(state.currentRegionId).toBe('penghu');
+    expect(state.currentEventId).toBe('penghu_event_1');
+    expect(state.isCompleted).toBe(false);
+  });
+
+  it('六枚印章與六片記憶若缺少秘密車票，仍停在普通結局', () => {
+    let state = initGame('no-secret-ticket');
+
+    for (let index = 0; index < REGION_SEQUENCE.length; index += 1) {
+      state = applyChoice(state, {
+        id: `memory_without_ticket_${index}`,
+        textId: 'memory_without_ticket_text',
+        consequenceTextId: 'memory_without_ticket_cons',
+        cost: { time: 0, fare: 0 },
+        givesMemory: true
+      });
+    }
+
+    expect(state.secretTicket).toBe(false);
+    expect(state.memoryFragments).toBe(6);
+    expect(state.ticketStamps).toEqual(REGION_SEQUENCE);
+    expect(state.currentRegionId).not.toBe('penghu');
+    expect(state.isCompleted).toBe(true);
+  });
+
+  it('三項條件齊全卻被標記為普通結局的存檔，應自動校正到澎湖', () => {
+    const inconsistentState = {
+      ...initGame('repair-complete-route'),
+      memoryFragments: 6,
+      ticketStamps: [...REGION_SEQUENCE],
+      secretTicket: true,
+      currentRegionId: 'east',
+      currentEventId: null,
+      history: [...REGION_SEQUENCE],
+      isCompleted: true,
+      selectedEnding: null,
+      stepIndex: 6
+    };
+
+    const repaired = reconcilePenghuRoute(inconsistentState);
+
+    expect(repaired.currentRegionId).toBe('penghu');
+    expect(repaired.currentEventId).toBe('penghu_event_1');
+    expect(repaired.isCompleted).toBe(false);
+    expect(repaired.selectedEnding).toBeNull();
+  });
+
+  it('缺少秘密車票的普通結局存檔不應被誤送往澎湖', () => {
+    const normalEndingState = {
+      ...initGame('keep-normal-ending'),
+      memoryFragments: 6,
+      ticketStamps: [...REGION_SEQUENCE],
+      secretTicket: false,
+      currentRegionId: 'east',
+      currentEventId: null,
+      history: [...REGION_SEQUENCE],
+      isCompleted: true,
+      selectedEnding: null,
+      stepIndex: 6
+    };
+
+    expect(reconcilePenghuRoute(normalEndingState)).toBe(normalEndingState);
   });
 
   it('應支援版本化存檔的序列化與遷移 (Save serialization & migration)', () => {

@@ -91,6 +91,8 @@ export function useGameState() {
       setState(restored);
       setWrongConsequence(null);
       setSuccessConsequence(null);
+      // migrateSave 也會校正三項條件齊全、卻誤停在普通結局的舊狀態。
+      localStorage.setItem(SAVE_KEY, serializeSave(restored));
       if (restored.isCompleted) {
         setPhase('ending');
       } else {
