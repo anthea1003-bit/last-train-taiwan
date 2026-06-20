@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react';
 import { translate } from '../content/locales';
 import {
   getOrderedChoices,
-  getPreferredChoiceId,
-  getScenarioModifier
+  getScenarioModifier,
+  isChoiceAccepted
 } from '../engine/game';
 import { Choice, Challenge, GameState, Language } from '../engine/types';
 import ConductorAgent from './ConductorAgent';
@@ -36,12 +36,11 @@ export default function ChallengePanel({
     () => getOrderedChoices(challenge, state),
     [challenge, state.seed, state.stepIndex]
   );
-  const preferredChoiceId = getPreferredChoiceId(state, challenge);
   const modifier = getScenarioModifier(state, challenge);
   const regionName = translate(`region_${state.currentRegionId}_name`, language);
 
   const handleChoiceClick = (choice: Choice) => {
-    onChoiceSelected(choice, choice.id === preferredChoiceId);
+    onChoiceSelected(choice, isChoiceAccepted(challenge, choice.id));
     setShowHint(false);
   };
 

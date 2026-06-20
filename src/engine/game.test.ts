@@ -9,7 +9,8 @@ import {
   selectEventForRegion,
   getOrderedChoices,
   getPreferredChoiceId,
-  getScenarioModifier
+  getScenarioModifier,
+  isChoiceAccepted
 } from './game';
 import { Choice } from './types';
 import { REGIONS, REGION_SEQUENCE } from '../content/regions';
@@ -124,6 +125,46 @@ describe('遊戲引擎測試 - 最後一班不存在的環島列車', () => {
 
     expect(preferredChoices.size).toBeGreaterThan(1);
     expect(modifiers.size).toBeGreaterThan(1);
+  });
+
+  it('故事決策的每條路都可前進，懷錶路線應確實發放秘密車票', () => {
+    const challenge = REGIONS[0].events[1].challenge;
+    const ticketChoice = challenge.choices.find(
+      (choice) => choice.id === 'north_c2_option_a'
+    );
+
+    if (!ticketChoice) {
+      throw new Error('找不到北部懷錶選項');
+    }
+
+    const state = {
+      ...initGame('story-choice-regression'),
+      currentEventId: 'north_event_2'
+    };
+
+    expect(challenge.correctChoiceId).toBeUndefined();
+    expect(isChoiceAccepted(challenge, ticketChoice.id)).toBe(true);
+
+    const nextState = applyChoice(state, ticketChoice);
+
+    expect(nextState.secretTicket).toBe(true);
+    expect(nextState.memoryFragments).toBe(1);
+    expect(nextState.ticketStamps).toContain('north');
+    expect(nextState.currentRegionId).toBe('hsinchu_miaoli');
+  });
+
+  it('有標準答案的異常題仍只接受正確選項', () => {
+    const challenge = REGIONS[0].events[0].challenge;
+    const wrongChoice = challenge.choices.find(
+      (choice) => choice.id !== challenge.correctChoiceId
+    );
+
+    if (!wrongChoice || !challenge.correctChoiceId) {
+      throw new Error('北部異常題缺少測試選項');
+    }
+
+    expect(isChoiceAccepted(challenge, wrongChoice.id)).toBe(false);
+    expect(isChoiceAccepted(challenge, challenge.correctChoiceId)).toBe(true);
   });
 
   it('應正確記錄六個印章 (Six stamps)', () => {

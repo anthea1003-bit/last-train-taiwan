@@ -163,6 +163,14 @@ export function getPreferredChoiceId(
   return selected.id;
 }
 
+export function isChoiceAccepted(
+  challenge: Challenge,
+  choiceId: string
+): boolean {
+  return challenge.correctChoiceId === undefined
+    || challenge.correctChoiceId === choiceId;
+}
+
 /**
  * 檢查是否符合澎湖（第七站）的解鎖資格
  */
