@@ -202,7 +202,11 @@ export function createConductorReply({
 export type AgentMode = 'local' | 'nano' | 'cloud';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
-const FALLBACK_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+const FALLBACK_KEYS = [
+  (import.meta as any).env?.VITE_GEMINI_API_KEY || '',
+  (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || '',
+  (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || ''
+].filter(Boolean);
 
 const CONDUCTOR_TOOLS = [
   {
@@ -234,7 +238,7 @@ export async function detectAgentMode(userApiKey?: string | null): Promise<Agent
     }
   }
 
-  if (userApiKey || FALLBACK_API_KEY) {
+  if (userApiKey || FALLBACK_KEYS.length > 0) {
     return 'cloud';
   }
 
@@ -311,7 +315,10 @@ Please guide the player using the current journey state and the anomaly at this 
     if (mode === 'nano') {
       replyText = await callLocalGeminiNano(systemPrompt, input);
     } else {
-      const apiKey = userApiKey || FALLBACK_API_KEY;
+      let apiKey = userApiKey;
+      if (!apiKey && FALLBACK_KEYS.length > 0) {
+        apiKey = FALLBACK_KEYS[Math.floor(Math.random() * FALLBACK_KEYS.length)];
+      }
       if (!apiKey) {
         throw new Error('No API Key available');
       }
