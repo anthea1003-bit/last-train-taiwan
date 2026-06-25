@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGameState } from './hooks/useGameState';
 import { translate } from './content/locales';
 import { REGIONS } from './content/regions';
@@ -10,8 +11,10 @@ import CarriageInterlude from './components/CarriageInterlude';
 import EndingPanel from './components/EndingPanel';
 import SaveCorruptedPanel from './components/SaveCorruptedPanel';
 import SceneStage from './components/SceneStage';
+import CapstonePanel from './components/CapstonePanel';
 
 export default function App() {
+  const [isCapstonePanelOpen, setIsCapstonePanelOpen] = useState(false);
   const {
     state,
     phase,
@@ -56,6 +59,14 @@ export default function App() {
 
         <div className="topbar-actions">
           <button
+            className="utility-button capstone-button"
+            onClick={() => setIsCapstonePanelOpen(true)}
+            aria-label={translate('capstone_open_label', language)}
+          >
+            <span aria-hidden="true">票</span>
+            <span className="utility-label">{translate('capstone_button', language)}</span>
+          </button>
+          <button
             className="utility-button"
             onClick={() => setLanguage(language === 'zh-TW' ? 'en' : 'zh-TW')}
             aria-label={`Switch to ${language === 'zh-TW' ? 'English' : '繁體中文'}`}
@@ -78,6 +89,13 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {isCapstonePanelOpen && (
+        <CapstonePanel
+          language={language}
+          onClose={() => setIsCapstonePanelOpen(false)}
+        />
+      )}
 
       <main className="main-content">
         {phase === 'title' && (

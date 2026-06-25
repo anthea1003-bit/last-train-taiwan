@@ -1,89 +1,111 @@
-# Day 2-Day 5 Capstone Evidence Plan
+# Day 2-Day 5 Capstone Evidence Map
+
+This map keeps the game concept and watercolor travel design intact while
+making the Kaggle x Google capstone evidence easy to review.
+
+## Evidence Boundary
+
+- The public game is zero-token, backend-free, and hosted as static files.
+- Codex was the primary implementation collaborator for the current game.
+- Antigravity participates in the course-aligned refinement, inspection, and
+  demo workflow.
+- Do not claim that Antigravity was the sole or primary developer.
 
 ## Day 2: Agent Tools And Interoperability
 
-Course evidence:
+Course concepts:
 
-- Build the project through Antigravity CLI.
-- Use implementation-plan and task artifacts.
-- Use shell tools to install, test, build, and inspect the app.
-- Configure and use Google Developer Knowledge MCP for official documentation.
-- Create a local read-only Taiwan travel knowledge MCP or equivalent fixture.
-- Record sources and tool decisions in `docs/evidence/day2-mcp-research.md`.
+- agentic coding workflow;
+- tool use;
+- MCP-style research and interoperability;
+- static public deployment boundary.
 
-Capstone value:
+Project evidence:
 
-- Demonstrates tool use, MCP reach, structured content ingestion, and a
-  multi-file application built through Agy.
+- `docs/evidence/day2-agy-build.md`
+- `docs/evidence/day2-mcp-research.md`
+- shell-based local verification through `npm test`, `npm run typecheck`, and
+  `npm run build`;
+- GitHub Pages public deployment.
+
+Demo moment:
+
+- Show Antigravity opening or inspecting the repository.
+- Show that the public game does not call a model or require a backend.
 
 ## Day 3: Agent Skills
 
-Create and evaluate three project skills:
+Course concepts:
 
-1. `quest-authoring`
-2. `travel-fact-check`
-3. `bilingual-localization`
+- reusable skills;
+- task routing;
+- focused production workflows.
 
-Each skill needs:
+Project evidence:
 
-- focused `SKILL.md`;
-- positive and negative triggers;
-- deterministic scripts where useful;
-- references loaded only on demand;
-- golden test cases;
-- evidence of successful invocation and non-invocation.
+- `skills/quest-authoring/SKILL.md`
+- `skills/travel-fact-check/SKILL.md`
+- `skills/bilingual-localization/SKILL.md`
+- `docs/evidence/day3-agent-skills.md`
 
-Capstone value:
+Demo moment:
 
-- Converts repeatable content-production procedures into portable skills.
+- Open the `skills/` folder and explain how a new station would move through
+  authoring, fact-checking, and bilingual localization before entering the game.
 
 ## Day 4: Security And Evaluation
 
-Security evidence:
+Course concepts:
 
-- human approval before generated quests enter production content;
-- threat model and security checklist;
-- no-secret check;
-- dependency audit;
-- XSS-safe rendering;
-- prompt-injection and poisoned-source red-team cases.
+- security boundaries;
+- human review;
+- automated tests;
+- no-spoiler agent behavior;
+- cost and privacy safety.
 
-Evaluation evidence:
+Project evidence:
 
-- unit tests for game rules;
-- local Conductor Agent intent and repetition regression tests;
-- deterministic variation tests for choice order and changing priorities;
-- schema and localization checks;
-- Playwright desktop and mobile journeys;
-- all endings tested;
-- accessibility checks;
-- reduced-motion checks for parallax, mist, and arrival transitions;
-- evaluation rubric covering factuality, cultural respect, puzzle clarity,
-  visual behavior, and cost.
+- `docs/evidence/day4-security-evaluation.md`
+- `src/agent/conductor.test.ts`
+- `src/engine/game.test.ts`
+- `src/content/integrity.test.ts`
 
-Outputs:
+Demo moment:
 
-- `docs/evidence/day4-security-report.md`
-- `docs/evidence/day4-evaluation-report.md`
+- Ask the Conductor Agent for an answer and show that it gives reasoning
+  guidance without copying the exact choice.
+- Show the tests or security/evaluation evidence document.
 
-## Day 5: Spec-Driven Production-Grade Development
+## Day 5: Spec-Driven Production Release
 
-Production evidence:
+Course concepts:
 
-- specifications under `specs/`;
-- Gherkin acceptance scenarios;
-- code treated as generated output of versioned specifications;
-- CI tests, build, security checks, and Pages deployment;
-- release summary, architecture diagram, and risk report;
-- public zero-token frontend connected to pre-approved static content.
+- specs as source of truth;
+- production-grade constraints;
+- deployability;
+- release evidence.
 
-The Google Cloud agent deployment codelabs are optional and may require
-billing. This project uses the free static deployment path while documenting
-how a cloud-hosted authoring agent could be added later.
+Project evidence:
 
-Outputs:
+- `specs/product-spec.md`
+- `specs/architecture.md`
+- `specs/acceptance.feature`
+- `docs/evidence/day5-production-release.md`
+- `docs/capstone-submission.md`
+- live GitHub Pages URL.
 
-- public GitHub Pages URL;
-- repository URL;
-- 3-5 minute demo video;
-- Kaggle writeup with rationale, architecture, evidence, and code link.
+Demo moment:
+
+- Click the in-game `Capstone Ticket`.
+- Show the live game, repository, and submission checklist.
+
+## Submission Priority
+
+For Kaggle Capstone, prioritize:
+
+1. a public playable game link;
+2. a public GitHub repository;
+3. a short video that shows the game, Conductor Agent, Capstone Ticket panel,
+   and Antigravity participation;
+4. a writeup that honestly describes Codex + Antigravity collaboration and
+   maps the project to at least three course concepts.

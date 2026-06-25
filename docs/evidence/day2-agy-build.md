@@ -1,6 +1,10 @@
 # Phase 1 交付憑證：遊戲引擎與 Vite 專案基礎建設
 
-本文件記錄了由 Antigravity CLI 與 AI 協同開發所建立的專案基礎架構，並說明其如何完美契合專案非談判約束（Non-Negotiable Constraints）。
+## 證據邊界
+
+本文件保留 Agy / Antigravity 參與課程工作流的證據。作品目前的核心遊戲實作與後續除錯、視覺強化、GitHub Pages 發布，主要由 Codex 協作完成；Antigravity 應在 Capstone 中誠實描述為「參與 refinement、repo inspection、agentic coding workflow 展示」，而不是整個作品的唯一或主要開發者。
+
+本文件記錄專案基礎架構如何符合非談判約束（Non-Negotiable Constraints），特別是公開遊戲零 runtime token、無後端、無 API key、免費靜態部署。
 
 ## 建立的檔案清單
 
@@ -30,15 +34,15 @@
 
 ---
 
-## 如何展示 Antigravity CLI 的威力
+## 如何展示 Antigravity CLI 的參與
 
-本專案的 Phase 1 構建過程充分展示了 Antigravity CLI 的幾個關鍵優勢：
+本專案可在 Capstone 影片中展示 Antigravity 參與以下工作流：
 
 - **嚴格的非談判約束遵循 (Compliance Control)**: 
   我們將遊戲邏輯、隨機數、本地化完全以**純 TypeScript 程式碼與資料夾**（`src/content/` 與 `src/engine/`）實作。這保證了在 runtime 時無須呼叫任何 AI 模型，做到零 runtime 成本與 0-token 目標，並完美運行於靜態託管（如 GitHub Pages）。
 
-- **精確的檔案操作與極簡依賴**: 
-  藉由 Antigravity 的檔案操作工具，我們精確地建立了整個 Vite 專案所需的檔案。未產生冗餘的 package-lock 或是 node_modules 垃圾檔案，並完全依循使用者的指令，在不使用 `run_command` 的前提下，將軟體工程架構與測試案例一鍵配置到位。
+- **精確的檔案檢視與 refinement**: 
+  藉由 Antigravity 的 IDE / CLI 工作流，可以檢視 repo、提出 implementation plan、針對小範圍修改進行 agentic coding refinement，並與本專案的規格、測試和證據文件對齊。
 
 - **多語言相容與狀態保留 (State Preservation)**:
   實作的 `translate` 函數使用 stable IDs。不論玩家在 Traditional Chinese 與 English 之間如何切換，`GameState` 依然維持不變，僅有 UI 呈現語系改變。
@@ -76,4 +80,3 @@
   所有按鈕和點擊元件擁有良好點擊範圍（大於 44px），支援鍵盤操作（如 `button` 標籤本身自帶 focus 及鍵盤觸發）。Reduced Motion 除了預設從系統 `prefers-reduced-motion` 取得外，也可以藉由 UI 頂部獨立開關控制，開關狀態同步寫入 localStorage，啟動時會關閉火車間奏的閃爍微光等特效。
 - **指定的 WebP 圖片資源與優雅 Fallback**:
   各區域配置專用圖片路徑（如 `/images/north-jiufen.webp`）。當圖片尚未加載或不存在時，會自動呈現帶有高質感漸層背景與該區域名稱的優雅文字/樣式 Fallback。
-

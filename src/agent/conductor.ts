@@ -198,3 +198,168 @@ export function createConductorReply({
       };
   }
 }
+
+export type AgentMode = 'local' | 'nano' | 'cloud';
+
+export async function detectAgentMode(userApiKey?: string | null): Promise<AgentMode> {
+  if (typeof window !== 'undefined') {
+    const aiObj = (window as any).ai || (window as any).chrome?.ai;
+    if (aiObj && aiObj.languageModel) {
+      try {
+        const capabilities = await aiObj.languageModel.capabilities();
+        if (capabilities.available !== 'no') {
+          return 'nano';
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+
+  if (userApiKey) {
+    return 'cloud';
+  }
+
+  const envKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
+  if (envKey) {
+    return 'cloud';
+  }
+
+  return 'local';
+}
+
+export async function createConductorReplyAsync({
+  input,
+  state,
+  challenge,
+  language,
+  turnIndex = 0,
+  userApiKey
+}: ConductorReplyInput & { userApiKey?: string | null }): Promise<ConductorReply> {
+  const mode = await detectAgentMode(userApiKey);
+
+  if (mode === 'local') {
+    return createConductorReply({ input, state, challenge, language, turnIndex });
+  }
+
+  const regionName = translate(`region_${state.currentRegionId}_name`, language);
+  const modifier = getScenarioModifier(state, challenge);
+  const ruleName = translate(`scenario_${modifier.replace('-', '_')}`, language);
+  const choiceTexts = challenge.choices.map((c) => translate(c.textId, language));
+
+  const systemPrompt = language === 'zh-TW'
+    ? `你是一輛台灣環島神秘列車上溫柔、親切且帶著一絲神祕感的「車長」。
+請依據以下當前旅程狀態與這一站的異常，引導玩家思考。
+
+【當前旅程狀態】
+- 目前停靠站：${regionName}
+- 剩餘時間：${state.time} 小時
+- 剩餘車資：NT$ ${state.fare}
+- 已收集印章：${state.ticketStamps.length}/6
+- 已找回記憶：${state.memoryFragments}/6
+- 秘密車票：${state.secretTicket ? '有，玩家已持有' : '無'}
+- 當局隱藏條件：${ruleName}（指引玩家根據此條件做出時間/車資/記憶的取捨）
+
+【當前車站異常與事件】
+- 異常事件：${translate(challenge.hintTextId, language)}
+- 玩家正面臨的抉擇選項包含：${choiceTexts.join('、')}
+
+【車長守則】
+1. 必須以「繁體中文」回覆。
+2. 保持回答溫暖、簡短（最多 3 至 4 句話），帶有列車長的沉穩語氣。
+3. ★★★ 絕對不能直接說出正確選項或答案文字，也不能複製選項中的文字。你只能提供推理引導。
+4. 當玩家詢問提示、答案或要注意什麼時，請引導他思考「當局隱藏條件 (${ruleName})」與選項背後的代價。`
+    : `You are the mysterious, gentle, and warm Conductor of a special round-island train in Taiwan.
+Please guide the player using the current journey state and the anomaly at this station.
+
+[Current Journey State]
+- Current Station: ${regionName}
+- Remaining Time: ${state.time} hours
+- Remaining Fare: NT$ ${state.fare}
+- Stamps collected: ${state.ticketStamps.length}/6
+- Memories retrieved: ${state.memoryFragments}/6
+- Secret Ticket: ${state.secretTicket ? 'Yes, the player carries it' : 'No'}
+- Current Run Rule: ${ruleName} (guide player to prioritize resources/memories accordingly)
+
+[Anomaly Details]
+- Anomaly description: ${translate(challenge.hintTextId, language)}
+- Player's choices text: ${choiceTexts.join(' OR ')}
+
+[Conductor Rules]
+1. You MUST reply in English.
+2. Keep your replies concise and warm (max 3-4 sentences), using a calm conductor tone.
+3. ★★★ NEVER tell the correct option or answer directly. NEVER copy the text of any choices. You only provide reasoning guidance.
+4. When asked for hints, help, or what to notice, guide the player to think about the run's rule ("${ruleName}") and the trade-offs of their resources.`;
+
+  try {
+    let replyText = '';
+    if (mode === 'nano') {
+      replyText = await callLocalGeminiNano(systemPrompt, input);
+    } else {
+      const apiKey = userApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error('No API Key available');
+      }
+      replyText = await callCloudGeminiAPI(systemPrompt, input, apiKey);
+    }
+
+    const intent = detectIntent(input);
+    return { intent, text: replyText.trim() };
+  } catch (error) {
+    console.error('[Conductor Agent Error]:', error);
+    return createConductorReply({ input, state, challenge, language, turnIndex });
+  }
+}
+
+async function callLocalGeminiNano(systemPrompt: string, userPrompt: string): Promise<string> {
+  const aiObj = (window as any).ai || (window as any).chrome?.ai;
+  const session = await aiObj.languageModel.create({
+    systemPrompt: systemPrompt
+  });
+  try {
+    const result = await session.prompt(userPrompt);
+    return result;
+  } finally {
+    session.destroy();
+  }
+}
+
+async function callCloudGeminiAPI(systemPrompt: string, userPrompt: string, apiKey: string): Promise<string> {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: userPrompt }]
+          }
+        ],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          maxOutputTokens: 200,
+          temperature: 0.7
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Gemini Cloud API failed with status ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error('Empty response from Gemini Cloud API');
+  }
+  return text;
+}
+

@@ -10,10 +10,29 @@ Kaggle x Google: 5-Day AI Agents Intensive Vibe Coding Course 2026.
 - Deliver a complete 15-minute browser game with six Taiwan regions and a
   hidden seventh station in Penghu.
 - Keep the public game zero-token, private, and free to host.
-- Use Antigravity CLI, MCP research, Agent Skills, evaluations, and
-  spec-driven development as the production workflow.
+- Use Codex collaboration plus Antigravity refinement, MCP-style research,
+  Agent Skills, evaluations, and spec-driven development as the production
+  workflow.
 - Preserve evidence for the Kaggle capstone writeup, demo video, and code
   submission.
+
+## Capstone Positioning
+
+Recommended Kaggle track: **Freestyle**.
+
+The current game was primarily implemented through Codex collaboration.
+Antigravity is used as a course-aligned agentic coding surface for repository
+inspection, refinement, and video evidence. The submission should describe that
+honestly rather than claiming Antigravity was the sole developer.
+
+Capstone evidence:
+
+- Submission pack: `docs/capstone-submission.md`
+- Day2-Day5 map: `docs/day2-day5-evidence.md`
+- Agent Skills: `skills/quest-authoring/`, `skills/travel-fact-check/`,
+  `skills/bilingual-localization/`
+- Security and evaluation: `docs/evidence/day4-security-evaluation.md`
+- Production release: `docs/evidence/day5-production-release.md`
 
 ## Source Of Truth
 
@@ -61,4 +80,5 @@ Verification:
 npm test
 npm run typecheck
 npm run build
+npm run capstone:check
 ```

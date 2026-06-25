@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "capstone:check": "node scripts/check-capstone-evidence.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",
