@@ -1888,28 +1888,64 @@ input:focus-visible {
     font-size: 22px;
   }
 
+  .section-heading small {
+    font-size: 11px;
+  }
+
+  .section-heading h2 {
+    font-size: 20px;
+  }
+
+  .section-number {
+    font-size: 13px;
+  }
+
   .route-list li {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .challenge-story {
     font-size: 16px;
   }
 
-  .challenge-hint-label {
+  .scenario-cue small {
     font-size: 11px;
   }
 
-  .challenge-hint-title {
-    font-size: 20px;
+  .scenario-cue strong {
+    font-size: 17px;
+  }
+
+  .scenario-cue p {
+    font-size: 14px;
+  }
+
+  .choice-heading {
+    font-size: 11px;
   }
 
   .choice-text {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .choice-cost {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .agent-header small {
+    font-size: 11px;
+  }
+
+  .agent-header h3 {
+    font-size: 19px;
+  }
+
+  .local-agent-badge {
+    font-size: 10px;
+  }
+
+  .agent-message span {
+    font-size: 10px;
   }
 
   .agent-message p {
@@ -1917,20 +1953,17 @@ input:focus-visible {
   }
 
   .agent-quick-prompts button {
-    font-size: 13px;
+    font-size: 14px;
   }
 
-  .agent-input-row input {
+  .agent-input-row input,
+  .agent-input-row button {
     font-size: 15px;
   }
 
   .journal-label,
   .journal-value {
     font-size: 15px;
-  }
-
-  .section-heading {
-    font-size: 13px;
   }
 }
 
