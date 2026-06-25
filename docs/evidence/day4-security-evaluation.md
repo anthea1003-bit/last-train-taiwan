@@ -13,15 +13,19 @@ The public release uses a 3-tier Conductor Agent with progressive AI access:
 - no billable Google Cloud resources charged to the project;
 - progress and optional user API key stored only in browser `localStorage`.
 
+*Note on architectural evolution*: The initial phase of this project carried **no runtime Gemini or LLM calls** and **No API keys** to maintain a pure static boundary. We have upgraded it to support client-side Gemini Flash and Nano, while maintaining the same security constraints.
+
+
 ## Threat Model
 
 | Risk | Mitigation |
 | --- | --- |
-| API key leakage | No project-owned keys are bundled. User-supplied keys are stored in `localStorage` with a `type="password"` input and never sent to any server other than Google's `generativelanguage.googleapis.com`. |
-| Billing surprise | Default tier is Gemini Nano (free, on-device) or local fallback. Cloud API only activates when the player explicitly opts in with their own key. |
+| API key leakage | User-supplied keys are stored in `localStorage` with a `type="password"` input and never sent to any server other than Google. The preloaded fallback API key is strictly limited to Google AI Studio's Free Tier (no billing, no financial exposure). |
+| Billing surprise | Default tier is Gemini Nano (free, on-device) or local fallback. Cloud API only activates when the player explicitly opts in with their own key, or falls back to the preloaded Free Tier key. |
 | Prompt injection via user input | The system prompt is hard-coded; user input is passed only as the user message, not interpolated into instructions. Gemini's own safety filters apply. |
 | Prompt injection through content | Content is typed data and rendered as React text, not raw HTML. |
 | Agent spoils answers | System prompt strictly forbids revealing or copying choice text. Local fallback also enforces non-spoiler rules via tests. |
+| Tool abuse / Function injection | Agent tools (`check_resources`, `get_travel_progress`) are read-only and consume no arguments. Front-end code intercepts functionCall names and maps them strictly to hardcoded GameState queries, preventing any injection or state manipulation. |
 | Broken or future save data | Versioned save migration fails safely and offers a fresh start. |
 | Hidden ending state drift | Regression tests cover secret ticket, six stamps, six memories, and Penghu routing repair. |
 | Localization mismatch | Integrity tests require referenced keys to exist in both languages. |
@@ -32,6 +36,7 @@ The public release uses a 3-tier Conductor Agent with progressive AI access:
 | --- | --- |
 | Game rules | `src/engine/game.test.ts` |
 | Agent behavior | `src/agent/conductor.test.ts` |
+| Agent tool use (Function Calling) | `src/agent/conductor.ts` (callCloudGeminiAPI implements tool definitions and a sandboxed execution loop) |
 | Content schema and localization | `src/content/integrity.test.ts` |
 | Build integrity | `npm run typecheck` and `npm run build` |
 | Runtime affordability | static GitHub Pages deployment, no backend |

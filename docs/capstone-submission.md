@@ -85,6 +85,7 @@ Suggested structure:
    checks.
 6. **What I Learned**: vibe coding becomes production-grade when constrained
    by specs, tests, security rules, and a clear demo path.
+7. **ADK Architecture Choice**: We made a deliberate decision to bypass cloud-hosted Vertex AI or Google ADK. Instead of building a server-heavy workflow, we implemented the 3-tier fallback and tool execution loop directly in a browser-native (TypeScript) architecture, proving that sophisticated Agentic workflows can run entirely serverless, zero-cost, and private.
 
 ## Submission Checklist
 

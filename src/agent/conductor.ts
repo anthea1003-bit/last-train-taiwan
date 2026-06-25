@@ -201,6 +201,24 @@ export function createConductorReply({
 
 export type AgentMode = 'local' | 'nano' | 'cloud';
 
+const GEMINI_MODEL = 'gemini-2.5-flash';
+const FALLBACK_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+
+const CONDUCTOR_TOOLS = [
+  {
+    functionDeclarations: [
+      {
+        name: 'check_resources',
+        description: "Retrieve the passenger's remaining resources (time in hours, and fare in NTD)."
+      },
+      {
+        name: 'get_travel_progress',
+        description: "Retrieve the passenger's current travel achievements, including collected stamp count, memory fragments count, and helped passengers count."
+      }
+    ]
+  }
+];
+
 export async function detectAgentMode(userApiKey?: string | null): Promise<AgentMode> {
   if (typeof window !== 'undefined') {
     const aiObj = (window as any).ai || (window as any).chrome?.ai;
@@ -216,12 +234,7 @@ export async function detectAgentMode(userApiKey?: string | null): Promise<Agent
     }
   }
 
-  if (userApiKey) {
-    return 'cloud';
-  }
-
-  const envKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
-  if (envKey) {
+  if (userApiKey || FALLBACK_API_KEY) {
     return 'cloud';
   }
 
@@ -267,8 +280,9 @@ export async function createConductorReplyAsync({
 【車長守則】
 1. 必須以「繁體中文」回覆。
 2. 保持回答溫暖、簡短（最多 3 至 4 句話），帶有列車長的沉穩語氣。
-3. ★★★ 絕對不能直接說出正確選項或答案文字，也不能複製選項中的文字。你只能提供推理引導。
-4. 當玩家詢問提示、答案或要注意什麼時，請引導他思考「當局隱藏條件 (${ruleName})」與選項背後的代價。`
+3. ★★ 絕對不能直接說出正確選項或答案文字，也不能複製選項中的文字。你只能提供推理引導。
+4. 當玩家詢問提示、答案或要注意什麼時，請引導他思考「當局隱藏條件 (${ruleName})」與選項背後的代價。
+5. 你可以使用提供的 Tool 來獲得即時最新的玩家時間、車資或旅程進度資訊。`
     : `You are the mysterious, gentle, and warm Conductor of a special round-island train in Taiwan.
 Please guide the player using the current journey state and the anomaly at this station.
 
@@ -288,19 +302,20 @@ Please guide the player using the current journey state and the anomaly at this 
 [Conductor Rules]
 1. You MUST reply in English.
 2. Keep your replies concise and warm (max 3-4 sentences), using a calm conductor tone.
-3. ★★★ NEVER tell the correct option or answer directly. NEVER copy the text of any choices. You only provide reasoning guidance.
-4. When asked for hints, help, or what to notice, guide the player to think about the run's rule ("${ruleName}") and the trade-offs of their resources.`;
+3. ★★ NEVER tell the correct option or answer directly. NEVER copy the text of any choices. You only provide reasoning guidance.
+4. When asked for hints, help, or what to notice, guide the player to think about the run's rule ("${ruleName}") and the trade-offs of their resources.
+5. You can call the provided Tools to fetch real-time passenger statistics, time, fare, or stamps.`
 
   try {
     let replyText = '';
     if (mode === 'nano') {
       replyText = await callLocalGeminiNano(systemPrompt, input);
     } else {
-      const apiKey = userApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      const apiKey = userApiKey || FALLBACK_API_KEY;
       if (!apiKey) {
         throw new Error('No API Key available');
       }
-      replyText = await callCloudGeminiAPI(systemPrompt, input, apiKey);
+      replyText = await callCloudGeminiAPI(systemPrompt, input, apiKey, state);
     }
 
     const intent = detectIntent(input);
@@ -324,31 +339,38 @@ async function callLocalGeminiNano(systemPrompt: string, userPrompt: string): Pr
   }
 }
 
-async function callCloudGeminiAPI(systemPrompt: string, userPrompt: string, apiKey: string): Promise<string> {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+async function callCloudGeminiAPI(
+  systemPrompt: string,
+  userPrompt: string,
+  apiKey: string,
+  state: GameState
+): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+  const contents = [
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: userPrompt }]
-          }
-        ],
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        generationConfig: {
-          maxOutputTokens: 200,
-          temperature: 0.7
-        }
-      })
+      role: 'user',
+      parts: [{ text: userPrompt }]
     }
-  );
+  ];
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      contents,
+      systemInstruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      tools: CONDUCTOR_TOOLS,
+      generationConfig: {
+        maxOutputTokens: 200,
+        temperature: 0.7
+      }
+    })
+  });
 
   if (!response.ok) {
     const errText = await response.text();
@@ -356,10 +378,79 @@ async function callCloudGeminiAPI(systemPrompt: string, userPrompt: string, apiK
   }
 
   const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
+  const part = data.candidates?.[0]?.content?.parts?.[0];
+  if (!part) {
     throw new Error('Empty response from Gemini Cloud API');
   }
-  return text;
+
+  if (part.functionCall) {
+    const { name: callName } = part.functionCall;
+
+    let responseObj = {};
+    if (callName === 'check_resources') {
+      responseObj = { time: state.time, fare: state.fare };
+    } else if (callName === 'get_travel_progress') {
+      responseObj = {
+        stamps: state.ticketStamps.length,
+        memories: state.memoryFragments,
+        helpedPassengers: state.helpedPassengers.length
+      };
+    }
+
+    const secondContents = [
+      ...contents,
+      {
+        role: 'model',
+        parts: [part]
+      },
+      {
+        role: 'user',
+        parts: [
+          {
+            functionResponse: {
+              name: callName,
+              response: responseObj
+            }
+          }
+        ]
+      }
+    ];
+
+    const secondResponse = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: secondContents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        tools: CONDUCTOR_TOOLS,
+        generationConfig: {
+          maxOutputTokens: 200,
+          temperature: 0.7
+        }
+      })
+    });
+
+    if (!secondResponse.ok) {
+      const errText = await secondResponse.text();
+      throw new Error(`Gemini API Tool-followup failed with status ${secondResponse.status}: ${errText}`);
+    }
+
+    const secondData = await secondResponse.json();
+    const finalReply = secondData.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!finalReply) {
+      throw new Error('Empty final response after tool execution');
+    }
+    return finalReply;
+  }
+
+  if (part.text) {
+    return part.text;
+  }
+
+  throw new Error('No text or functionCall returned from Gemini Cloud API');
 }
 
