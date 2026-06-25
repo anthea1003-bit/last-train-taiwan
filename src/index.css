@@ -589,6 +589,8 @@ input:focus-visible {
   padding: 22px clamp(14px, 2.4vw, 38px) 40px;
   color: var(--white);
   transform-style: preserve-3d;
+  display: flex;
+  flex-direction: column;
 }
 
 .ticket-status,
@@ -692,6 +694,7 @@ input:focus-visible {
   gap: 18px;
   align-items: start;
   transform-style: preserve-3d;
+  flex: 1;
 }
 
 .journey-sidebar {
