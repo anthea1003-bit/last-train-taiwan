@@ -1873,6 +1873,67 @@ input:focus-visible {
   }
 }
 
+@media (min-width: 1400px) {
+  .ticket-status {
+    font-size: 16px;
+  }
+
+  .ticket-kicker,
+  .ticket-heading small,
+  .ticket-metric small {
+    font-size: 12px;
+  }
+
+  .ticket-metric strong {
+    font-size: 22px;
+  }
+
+  .route-list li {
+    font-size: 16px;
+  }
+
+  .challenge-story {
+    font-size: 16px;
+  }
+
+  .challenge-hint-label {
+    font-size: 11px;
+  }
+
+  .challenge-hint-title {
+    font-size: 20px;
+  }
+
+  .choice-text {
+    font-size: 16px;
+  }
+
+  .choice-cost {
+    font-size: 12px;
+  }
+
+  .agent-message p {
+    font-size: 15px;
+  }
+
+  .agent-quick-prompts button {
+    font-size: 13px;
+  }
+
+  .agent-input-row input {
+    font-size: 15px;
+  }
+
+  .journal-label,
+  .journal-value {
+    font-size: 15px;
+  }
+
+  .section-heading {
+    font-size: 13px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
