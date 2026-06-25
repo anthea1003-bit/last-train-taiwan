@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { createConductorReplyAsync, detectAgentMode, AgentMode } from '../agent/conductor';
 import { translate } from '../content/locales';
@@ -27,6 +27,11 @@ export default function ConductorAgent({
   const [agentMode, setAgentMode] = useState<AgentMode>('local');
   const [showSettings, setShowSettings] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
   useEffect(() => {
     const savedKey = localStorage.getItem('user_gemini_api_key') || '';
@@ -166,6 +171,7 @@ export default function ConductorAgent({
             </p>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="agent-quick-prompts">
