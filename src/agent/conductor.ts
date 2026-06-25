@@ -373,7 +373,7 @@ async function callCloudGeminiAPI(
       },
       tools: CONDUCTOR_TOOLS,
       generationConfig: {
-        maxOutputTokens: 200,
+        maxOutputTokens: 400,
         temperature: 0.7
       }
     })
@@ -435,7 +435,7 @@ async function callCloudGeminiAPI(
         },
         tools: CONDUCTOR_TOOLS,
         generationConfig: {
-          maxOutputTokens: 200,
+          maxOutputTokens: 400,
           temperature: 0.7
         }
       })
