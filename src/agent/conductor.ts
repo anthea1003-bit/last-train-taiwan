@@ -283,7 +283,7 @@ export async function createConductorReplyAsync({
 
 【車長守則】
 1. 必須以「繁體中文」回覆。
-2. 保持回答溫暖、簡短（最多 3 至 4 句話），帶有列車長的沉穩語氣。
+2. 保持回答溫暖、簡短（最多 2 至 3 句話，總字數不超過 80 字），帶有列車長的沉穩語氣。每次回覆必須是完整的句子，絕不能中途截斷。
 3. ★★ 絕對不能直接說出正確選項或答案文字，也不能複製選項中的文字。你只能提供推理引導。
 4. 當玩家詢問提示、答案或要注意什麼時，請引導他思考「當局隱藏條件 (${ruleName})」與選項背後的代價。
 5. 你可以使用提供的 Tool 來獲得即時最新的玩家時間、車資或旅程進度資訊。`
@@ -305,7 +305,7 @@ Please guide the player using the current journey state and the anomaly at this 
 
 [Conductor Rules]
 1. You MUST reply in English.
-2. Keep your replies concise and warm (max 3-4 sentences), using a calm conductor tone.
+2. Keep your replies concise and warm (max 2-3 sentences, under 80 words), using a calm conductor tone. Every reply must end with a complete sentence — never cut off mid-thought.
 3. ★★ NEVER tell the correct option or answer directly. NEVER copy the text of any choices. You only provide reasoning guidance.
 4. When asked for hints, help, or what to notice, guide the player to think about the run's rule ("${ruleName}") and the trade-offs of their resources.
 5. You can call the provided Tools to fetch real-time passenger statistics, time, fare, or stamps.`
@@ -374,7 +374,8 @@ async function callCloudGeminiAPI(
       tools: CONDUCTOR_TOOLS,
       generationConfig: {
         maxOutputTokens: 400,
-        temperature: 0.7
+        temperature: 0.7,
+        thinkingConfig: { thinkingBudget: 0 }
       }
     })
   });
@@ -436,7 +437,8 @@ async function callCloudGeminiAPI(
         tools: CONDUCTOR_TOOLS,
         generationConfig: {
           maxOutputTokens: 400,
-          temperature: 0.7
+          temperature: 0.7,
+          thinkingConfig: { thinkingBudget: 0 }
         }
       })
     });

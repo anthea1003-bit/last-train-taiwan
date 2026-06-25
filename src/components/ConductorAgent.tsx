@@ -27,10 +27,13 @@ export default function ConductorAgent({
   const [agentMode, setAgentMode] = useState<AgentMode>('local');
   const [showSettings, setShowSettings] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesContainerRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages, isTyping]);
 
   useEffect(() => {
@@ -156,7 +159,7 @@ export default function ConductorAgent({
         </div>
       )}
 
-      <div className="agent-messages" aria-live="polite">
+      <div className="agent-messages" ref={messagesContainerRef} aria-live="polite">
         {messages.map((message) => (
           <div className={`agent-message is-${message.role}`} key={message.id}>
             <span>{message.role === 'agent' ? translate('agent_name', language) : translate('label_you', language)}</span>
@@ -171,7 +174,6 @@ export default function ConductorAgent({
             </p>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <div className="agent-quick-prompts">
