@@ -2,23 +2,26 @@
 
 ## Security Boundary
 
-The public release is intentionally static:
+The public release uses a 3-tier Conductor Agent with progressive AI access:
 
-- no runtime Gemini or LLM calls;
-- No API keys in browser code;
+- **Tier 1 (Gemini Nano)**: Chrome built-in on-device AI — zero network calls, zero cost;
+- **Tier 2 (Gemini Cloud API)**: opt-in by the player pasting their own API key — no project-bundled keys;
+- **Tier 3 (Local fallback)**: deterministic rule-based engine — always available offline;
+- no project-owned API keys shipped in the bundle or environment;
 - no accounts, analytics, geolocation, or personal data collection;
 - no backend server;
-- no billable Google Cloud resources;
-- progress is stored only in browser `localStorage`.
+- no billable Google Cloud resources charged to the project;
+- progress and optional user API key stored only in browser `localStorage`.
 
 ## Threat Model
 
 | Risk | Mitigation |
 | --- | --- |
-| API key leakage | No runtime API keys are used or bundled. |
-| Billing surprise | Public game has no model calls and deploys as static assets. |
+| API key leakage | No project-owned keys are bundled. User-supplied keys are stored in `localStorage` with a `type="password"` input and never sent to any server other than Google's `generativelanguage.googleapis.com`. |
+| Billing surprise | Default tier is Gemini Nano (free, on-device) or local fallback. Cloud API only activates when the player explicitly opts in with their own key. |
+| Prompt injection via user input | The system prompt is hard-coded; user input is passed only as the user message, not interpolated into instructions. Gemini's own safety filters apply. |
 | Prompt injection through content | Content is typed data and rendered as React text, not raw HTML. |
-| Agent spoils answers | Conductor Agent tests assert that hint replies do not copy choice text. |
+| Agent spoils answers | System prompt strictly forbids revealing or copying choice text. Local fallback also enforces non-spoiler rules via tests. |
 | Broken or future save data | Versioned save migration fails safely and offers a fresh start. |
 | Hidden ending state drift | Regression tests cover secret ticket, six stamps, six memories, and Penghu routing repair. |
 | Localization mismatch | Integrity tests require referenced keys to exist in both languages. |
@@ -46,9 +49,7 @@ The Conductor Agent is allowed to:
 The Conductor Agent must not:
 
 - copy the exact correct choice text;
-- pretend to call a model;
 - request personal data;
-- instruct the player to use paid services;
 - change game state outside the approved UI flow.
 
 ## Current Verification Command Set
@@ -64,8 +65,12 @@ npm run capstone:check
 
 ## Residual Risk
 
-The in-game Conductor Agent is deterministic and local, not a hosted Gemini or
-ADK agent. This is a deliberate cost and privacy tradeoff. The submission
-should explain that AI agent concepts are demonstrated through local agent
-logic, agentic development workflow, skills, security evaluation, and
-deployability rather than runtime model billing.
+- **Gemini Nano availability**: Chrome built-in AI is still rolling out and may
+  not be available in all browsers. The local fallback guarantees the game is
+  always playable.
+- **User API key in localStorage**: not encrypted. This is standard browser
+  practice for client-side keys but the settings panel makes the tradeoff
+  visible to the player.
+- **System prompt bypass**: a determined player could inspect the bundled JS
+  and read the system prompt. This is acceptable since the game is
+  single-player and the prompt contains no secrets beyond game hints.

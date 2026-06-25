@@ -44,8 +44,10 @@ Capstone evidence:
 
 ## Cost Boundary
 
-The public game must not call Gemini or any paid API at runtime. AI and MCP
-are development-time tools only. Player progress is stored locally in the
+The game ships no project-owned API keys. The Conductor Agent uses a 3-tier
+fallback: Chrome built-in Gemini Nano (free, on-device) → player-supplied
+Gemini API key (opt-in) → local rule-based engine (always available offline).
+No cost is charged to the project. Player progress is stored locally in the
 browser.
 
 ## Deployment
@@ -60,8 +62,8 @@ deploying the static game to GitHub Pages.
 - Full-screen landmark stages with layered depth, pointer parallax, mist, and
   reduced-motion support.
 - Cinematic station transitions that preview the next landmark.
-- A bilingual local Conductor Agent that reads journey context and answers
-  questions without network or model calls.
+- A bilingual 3-tier Conductor Agent: Gemini Nano (on-device AI) → Gemini
+  Cloud API (player opt-in) → local rule-based fallback.
 - Seeded event selection, seeded choice order, and changing decision
   priorities so the best route is not fixed across journeys.
 - Versioned local saves, recoverable mistakes, three normal endings, and one
