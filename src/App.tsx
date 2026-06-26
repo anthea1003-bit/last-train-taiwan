@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameState } from './hooks/useGameState';
 import { translate } from './content/locales';
 import { REGIONS } from './content/regions';
@@ -35,6 +35,31 @@ export default function App() {
     freshStart,
     clearWrongConsequence
   } = useGameState();
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio(`${import.meta.env.BASE_URL}audio/Nocturne.mp3`);
+    audio.loop = true;
+    audio.volume = 0.35;
+    audioRef.current = audio;
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isMusicPlaying) {
+      audio.pause();
+      setIsMusicPlaying(false);
+    } else {
+      audio.play().then(() => setIsMusicPlaying(true)).catch(() => {});
+    }
+  }, [isMusicPlaying]);
 
   const currentRegion = state
     ? REGIONS.find((region) => region.id === state.currentRegionId)
@@ -85,6 +110,22 @@ export default function App() {
             <span aria-hidden="true">◐</span>
             <span className="utility-label">
               {translate(reducedMotion ? 'reduced_motion_active' : 'reduced_motion_inactive', language)}
+            </span>
+          </button>
+          <button
+            className={`utility-button ${isMusicPlaying ? 'is-active' : ''}`}
+            onClick={toggleMusic}
+            aria-label={isMusicPlaying
+              ? translate('music_on', language)
+              : translate('music_off', language)
+            }
+          >
+            <span aria-hidden="true">{isMusicPlaying ? '♫' : '♪'}</span>
+            <span className="utility-label">
+              {isMusicPlaying
+                ? translate('music_on', language)
+                : translate('music_off', language)
+              }
             </span>
           </button>
         </div>
