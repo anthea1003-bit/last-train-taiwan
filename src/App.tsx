@@ -168,7 +168,6 @@ export default function App() {
               <div className="journey-facts" aria-label={translate('label_journey_facts', language)}>
                 <span>07 {translate('label_stations_short', language)}</span>
                 <span>15 {translate('label_minutes', language)}</span>
-                <span>00 {translate('label_public_tokens', language)}</span>
               </div>
             </div>
           </section>

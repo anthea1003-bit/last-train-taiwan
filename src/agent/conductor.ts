@@ -199,7 +199,7 @@ export function createConductorReply({
   }
 }
 
-export type AgentMode = 'local' | 'nano' | 'cloud';
+export type AgentMode = 'local' | 'cloud';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const FALLBACK_KEYS = [
@@ -224,20 +224,6 @@ const CONDUCTOR_TOOLS = [
 ];
 
 export async function detectAgentMode(userApiKey?: string | null): Promise<AgentMode> {
-  if (typeof window !== 'undefined') {
-    const aiObj = (window as any).ai || (window as any).chrome?.ai;
-    if (aiObj && aiObj.languageModel) {
-      try {
-        const capabilities = await aiObj.languageModel.capabilities();
-        if (capabilities.available !== 'no') {
-          return 'nano';
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-  }
-
   if (userApiKey || FALLBACK_KEYS.length > 0) {
     return 'cloud';
   }
@@ -250,10 +236,9 @@ export async function createConductorReplyAsync({
   state,
   challenge,
   language,
-  turnIndex = 0,
-  userApiKey
-}: ConductorReplyInput & { userApiKey?: string | null }): Promise<ConductorReply> {
-  const mode = await detectAgentMode(userApiKey);
+  turnIndex = 0
+}: ConductorReplyInput): Promise<ConductorReply> {
+  const mode = await detectAgentMode();
 
   if (mode === 'local') {
     return createConductorReply({ input, state, challenge, language, turnIndex });
@@ -321,33 +306,26 @@ Please guide the player using the current journey state and the anomaly at this 
 6. When the player asks questions unrelated to the game (e.g., Taiwan geography, history), give a brief warm response, then gently steer back to the journey.`
 
   try {
+    const uniqueKeys = [...FALLBACK_KEYS];
+
+    if (uniqueKeys.length === 0) {
+      throw new Error('No API Key available');
+    }
+
     let replyText = '';
-    if (mode === 'nano') {
-      replyText = await callLocalGeminiNano(systemPrompt, input);
-    } else {
-      const keysToTry = userApiKey
-        ? [userApiKey, ...FALLBACK_KEYS]
-        : [...FALLBACK_KEYS];
-      const uniqueKeys = [...new Set(keysToTry.filter(Boolean))];
-
-      if (uniqueKeys.length === 0) {
-        throw new Error('No API Key available');
+    let lastError: Error | null = null;
+    for (const key of uniqueKeys) {
+      try {
+        replyText = await callCloudGeminiAPI(systemPrompt, input, key, state);
+        lastError = null;
+        break;
+      } catch (e) {
+        lastError = e as Error;
+        console.warn(`[Conductor] Key failed, trying next...`, e);
       }
-
-      let lastError: Error | null = null;
-      for (const key of uniqueKeys) {
-        try {
-          replyText = await callCloudGeminiAPI(systemPrompt, input, key, state);
-          lastError = null;
-          break;
-        } catch (e) {
-          lastError = e as Error;
-          console.warn(`[Conductor] Key failed, trying next...`, e);
-        }
-      }
-      if (lastError) {
-        throw lastError;
-      }
+    }
+    if (lastError) {
+      throw lastError;
     }
 
     const intent = detectIntent(input);
@@ -358,19 +336,6 @@ Please guide the player using the current journey state and the anomaly at this 
       ? '列車正穿越一段訊號不穩的山洞……稍後再問我吧，我一定會回應你的。'
       : 'The train is passing through a tunnel with weak signal… Ask me again shortly, I will answer.';
     return { intent: 'unknown', text: fallbackText };
-  }
-}
-
-async function callLocalGeminiNano(systemPrompt: string, userPrompt: string): Promise<string> {
-  const aiObj = (window as any).ai || (window as any).chrome?.ai;
-  const session = await aiObj.languageModel.create({
-    systemPrompt: systemPrompt
-  });
-  try {
-    const result = await session.prompt(userPrompt);
-    return result;
-  } finally {
-    session.destroy();
   }
 }
 
