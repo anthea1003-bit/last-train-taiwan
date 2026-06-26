@@ -332,10 +332,7 @@ Please guide the player using the current journey state and the anomaly at this 
     return { intent, text: replyText.trim() };
   } catch (error) {
     console.error('[Conductor Agent Error]:', error);
-    const fallbackText = language === 'zh-TW'
-      ? '列車正穿越一段訊號不穩的山洞……稍後再問我吧，我一定會回應你的。'
-      : 'The train is passing through a tunnel with weak signal… Ask me again shortly, I will answer.';
-    return { intent: 'unknown', text: fallbackText };
+    return createConductorReply({ input, state, challenge, language, turnIndex });
   }
 }
 
