@@ -193,8 +193,8 @@ export function createConductorReply({
       return {
         intent,
         text: language === 'zh-TW'
-          ? '我聽見你的問題了，但車長室只能讀取這趟旅程的紀錄。試著問「這一站要注意什麼」、「我的資源夠嗎」或「秘密車票是什麼」。'
-          : 'I heard you, but the conductor can only read this journey log. Try asking what matters at this station, whether your resources are enough, or what the secret ticket does.'
+          ? '嗯，這是個有趣的問題。不過身為車長，我最擅長的是這趟旅程裡的事——這一站的線索、你的資源狀態，或是秘密車票的秘密。要不要試試看？'
+          : 'An interesting question indeed. But as the conductor, my specialty is this journey — station clues, your resources, or the secrets of the secret ticket. Shall we talk about those?'
       };
   }
 }
@@ -315,21 +315,39 @@ Please guide the player using the current journey state and the anomaly at this 
     if (mode === 'nano') {
       replyText = await callLocalGeminiNano(systemPrompt, input);
     } else {
-      let apiKey = userApiKey;
-      if (!apiKey && FALLBACK_KEYS.length > 0) {
-        apiKey = FALLBACK_KEYS[Math.floor(Math.random() * FALLBACK_KEYS.length)];
-      }
-      if (!apiKey) {
+      const keysToTry = userApiKey
+        ? [userApiKey, ...FALLBACK_KEYS]
+        : [...FALLBACK_KEYS];
+      const uniqueKeys = [...new Set(keysToTry.filter(Boolean))];
+
+      if (uniqueKeys.length === 0) {
         throw new Error('No API Key available');
       }
-      replyText = await callCloudGeminiAPI(systemPrompt, input, apiKey, state);
+
+      let lastError: Error | null = null;
+      for (const key of uniqueKeys) {
+        try {
+          replyText = await callCloudGeminiAPI(systemPrompt, input, key, state);
+          lastError = null;
+          break;
+        } catch (e) {
+          lastError = e as Error;
+          console.warn(`[Conductor] Key failed, trying next...`, e);
+        }
+      }
+      if (lastError) {
+        throw lastError;
+      }
     }
 
     const intent = detectIntent(input);
     return { intent, text: replyText.trim() };
   } catch (error) {
     console.error('[Conductor Agent Error]:', error);
-    return createConductorReply({ input, state, challenge, language, turnIndex });
+    const fallbackText = language === 'zh-TW'
+      ? '列車正穿越一段訊號不穩的山洞……稍後再問我吧，我一定會回應你的。'
+      : 'The train is passing through a tunnel with weak signal… Ask me again shortly, I will answer.';
+    return { intent: 'unknown', text: fallbackText };
   }
 }
 

@@ -91,7 +91,7 @@ export default function CarriageInterlude({
             <small>{translate('reward_title', language)}</small>
             <div className="reward-items">
               {rewardItems.map((item) => (
-                <div className={`reward-item reward-${item.type}`} key={item.type}>
+                <div className={`reward-item reward-${item.type}`} key={`${item.type}-${language}`}>
                   <span className="reward-icon" aria-hidden="true">
                     {item.type === 'stamp' && '印'}
                     {item.type === 'memory' && '◇'}
