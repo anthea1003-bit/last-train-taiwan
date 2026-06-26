@@ -178,7 +178,7 @@ export const LOCALES: Record<Language, Record<string, string>> = {
     // 中部
     'central_event_1_desc': '日月潭的水面上泛著粼粼金光，但拉魯島似乎被濃霧包圍，隱約有邵族長老的歌聲傳來。',
     'central_chall_1_desc': '長老在尋找失去的聖鳥「白鹿」的石雕，這似乎是封印時空裂縫的鑰匙。',
-    'central_chall_1_hint': '提示：尋找水面上象徵白鹿指引的古老木雕。',
+    'central_chall_1_hint': '提示：尋找水面上象徵白鹿指引的古老石雕。',
     'central_c1_correct_text': '駕著小舟划向拉魯島，在霧氣最濃處尋找，成功在古樹下尋回白鹿石雕。',
     'central_c1_correct_cons': '將石雕歸還後，長老吟唱起古老的歌謠。湖面濃霧散去，你記起了一段關於湖畔黃昏的承諾。',
     'central_c1_incorrect_text': '沿著鹿形水紋追到湖岸，判斷石雕藏在倒影對應的舊碼頭下。',
@@ -437,7 +437,7 @@ export const LOCALES: Record<Language, Record<string, string>> = {
     // Central
     'central_event_1_desc': 'Golden ripples shimmer on the surface of Sun Moon Lake, but Lalu Island is enveloped in dense fog, with faint singing from a Thao elder.',
     'central_chall_1_desc': 'The elder is searching for the lost stone carving of the sacred "White Deer," which seems to be the key to sealing the time rift.',
-    'central_chall_1_hint': 'Hint: Search for the ancient wooden carving on the water symbolizing the white deer\'s guidance.',
+    'central_chall_1_hint': 'Hint: Search for the ancient stone carving on the water symbolizing the white deer\'s guidance.',
     'central_c1_correct_text': 'Row a small boat to Lalu Island, search in the thickest fog, and recover the white deer carving under the ancient tree.',
     'central_c1_correct_cons': 'After returning the carving, the elder sings an ancient song. The fog clears, and you remember a twilight promise by the lake.',
     'central_c1_incorrect_text': 'Follow deer-shaped ripples to the shore, reasoning that the carving lies beneath the old pier reflected in the water.',

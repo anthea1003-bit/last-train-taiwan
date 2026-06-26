@@ -28,16 +28,6 @@ export default function TravelJournal({ state, language }: TravelJournalProps) {
         </div>
       </div>
 
-      <div className="clue-list">
-        <h3>{translate('clues_title', language)}</h3>
-        {state.clues.length === 0 ? (
-          <p>{translate('no_clues', language)}</p>
-        ) : (
-          <ul>
-            {state.clues.map((clueId) => <li key={clueId}>{translate(clueId, language)}</li>)}
-          </ul>
-        )}
-      </div>
     </section>
   );
 }
