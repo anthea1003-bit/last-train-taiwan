@@ -4,7 +4,7 @@
 
 本文件保留 Agy / Antigravity 參與課程工作流的證據。作品目前的核心遊戲實作與後續除錯、視覺強化、GitHub Pages 發布，主要由 Codex 協作完成；Antigravity 應在 Capstone 中誠實描述為「參與 refinement、repo inspection、agentic coding workflow 展示」，而不是整個作品的唯一或主要開發者。
 
-本文件記錄專案基礎架構如何符合非談判約束（Non-Negotiable Constraints），特別是公開遊戲零 runtime token、無後端、無 API key、免費靜態部署。
+本文件記錄專案基礎架構如何符合非談判約束（Non-Negotiable Constraints），特別是公開遊戲使用 Gemini Free Tier（無帳單）、無後端、免費靜態部署。
 
 ## 建立的檔案清單
 
@@ -39,7 +39,7 @@
 本專案可在 Capstone 影片中展示 Antigravity 參與以下工作流：
 
 - **嚴格的非談判約束遵循 (Compliance Control)**: 
-  我們將遊戲邏輯、隨機數、本地化完全以**純 TypeScript 程式碼與資料夾**（`src/content/` 與 `src/engine/`）實作。這保證了在 runtime 時無須呼叫任何 AI 模型，做到零 runtime 成本與 0-token 目標，並完美運行於靜態託管（如 GitHub Pages）。
+  我們將遊戲邏輯、隨機數、本地化完全以**純 TypeScript 程式碼與資料夾**（`src/content/` 與 `src/engine/`）實作。遊戲核心邏輯不依賴 AI 模型即可運作，而車長 Agent 使用 Gemini Free Tier 提供 AI 互動體驗（無帳單、零成本），並完美運行於靜態託管（如 GitHub Pages）。
 
 - **精確的檔案檢視與 refinement**: 
   藉由 Antigravity 的 IDE / CLI 工作流，可以檢視 repo、提出 implementation plan、針對小範圍修改進行 agentic coding refinement，並與本專案的規格、測試和證據文件對齊。

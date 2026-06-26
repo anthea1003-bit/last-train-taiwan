@@ -5,7 +5,7 @@ making the Kaggle x Google capstone evidence easy to review.
 
 ## Evidence Boundary
 
-- The public game is zero-token, backend-free, and hosted as static files.
+- The public game uses Gemini Free Tier for the Conductor Agent, is backend-free, and hosted as static files.
 - Codex was the primary implementation collaborator for the current game.
 - Antigravity participates in the course-aligned refinement, inspection, and
   demo workflow.
@@ -31,7 +31,7 @@ Project evidence:
 Demo moment:
 
 - Show Antigravity opening or inspecting the repository.
-- Show that the public game does not call a model or require a backend.
+- Show that the public game calls Gemini 2.5 Flash via Free Tier keys and requires no backend.
 
 ## Day 3: Agent Skills
 

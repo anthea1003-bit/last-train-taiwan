@@ -19,7 +19,7 @@ installation, or changing the public cost boundary.
 ## Production Constraints
 
 - Preserve the seven-station structure in `specs/product-spec.md`.
-- Public gameplay must remain zero-token and backend-free.
+- Public gameplay must remain free (Gemini Free Tier) and backend-free.
 - The player is always human.
 - Wrong choices must be recoverable and gently explained.
 - Choices should be plausible, not obviously foolish.

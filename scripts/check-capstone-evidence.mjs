@@ -32,7 +32,7 @@ const requiredText = [
   },
   {
     file: 'docs/evidence/day4-security-evaluation.md',
-    snippets: ['no runtime Gemini or LLM calls', 'No API keys', 'Non-Spoiler Agent Evaluation']
+    snippets: ['Free Tier', 'no billing', 'Non-Spoiler Agent Evaluation']
   },
   {
     file: 'docs/day2-day5-evidence.md',

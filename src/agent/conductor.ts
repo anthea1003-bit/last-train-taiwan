@@ -202,11 +202,13 @@ export function createConductorReply({
 export type AgentMode = 'local' | 'cloud';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
-const FALLBACK_KEYS = [
-  (import.meta as any).env?.VITE_GEMINI_API_KEY || '',
-  (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || '',
-  (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || ''
-].filter(Boolean);
+function getFallbackKeys(): string[] {
+  return [
+    (import.meta as any).env?.VITE_GEMINI_API_KEY || '',
+    (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || '',
+    (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || ''
+  ].filter(Boolean);
+}
 
 const CONDUCTOR_TOOLS = [
   {
@@ -224,7 +226,7 @@ const CONDUCTOR_TOOLS = [
 ];
 
 export async function detectAgentMode(userApiKey?: string | null): Promise<AgentMode> {
-  if (userApiKey || FALLBACK_KEYS.length > 0) {
+  if (userApiKey || getFallbackKeys().length > 0) {
     return 'cloud';
   }
 
@@ -306,7 +308,7 @@ Please guide the player using the current journey state and the anomaly at this 
 6. When the player asks questions unrelated to the game (e.g., Taiwan geography, history), give a brief warm response, then gently steer back to the journey.`
 
   try {
-    const uniqueKeys = [...FALLBACK_KEYS];
+    const uniqueKeys = [...getFallbackKeys()];
 
     if (uniqueKeys.length === 0) {
       throw new Error('No API Key available');

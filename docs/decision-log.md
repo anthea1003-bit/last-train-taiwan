@@ -22,7 +22,7 @@
 
 ## Architecture
 
-- Public runtime is static and zero-token.
+- Public runtime is static with Gemini Free Tier API keys (no billing).
 - Development-time agents may research, author, fact-check, localize, test,
   and review content.
 - Save progress only in versioned localStorage.

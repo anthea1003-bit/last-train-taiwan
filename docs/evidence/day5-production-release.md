@@ -10,8 +10,8 @@ free public release path:
 - GitHub Pages deployment;
 - no runtime Google Cloud resources.
 
-This keeps the capstone playable by anyone without requiring API keys, accounts,
-or paid infrastructure.
+This keeps the capstone playable by anyone without requiring accounts or paid
+infrastructure. Gemini API keys are project-provided Free Tier (no billing).
 
 ## Spec Sources
 
@@ -36,7 +36,7 @@ The live demo should show:
 
 1. title screen and Capstone Ticket panel;
 2. one station challenge;
-3. local Conductor Agent response;
+3. Conductor Agent response (Gemini 2.5 Flash or local fallback);
 4. reward animation and ticket state;
 5. GitHub repo evidence files;
 6. Antigravity refinement workflow.
@@ -44,5 +44,6 @@ The live demo should show:
 ## Release Boundary
 
 The public release is not a Google Cloud deployment. That is intentional. The
-project prioritizes a free, zero-token capstone demo, while documenting how
-agentic authoring and evaluation were used during development.
+project uses Gemini Free Tier API keys (no billing) for the runtime AI
+experience, while documenting how agentic authoring and evaluation were used
+during development.

@@ -9,7 +9,7 @@ Kaggle x Google: 5-Day AI Agents Intensive Vibe Coding Course 2026.
 
 - Deliver a complete 15-minute browser game with six Taiwan regions and a
   hidden seventh station in Penghu.
-- Keep the public game zero-token, private, and free to host.
+- Keep the public game free to play using Gemini Free Tier, private, and free to host.
 - Use Codex collaboration plus Antigravity refinement, MCP-style research,
   Agent Skills, evaluations, and spec-driven development as the production
   workflow.
@@ -44,11 +44,11 @@ Capstone evidence:
 
 ## Cost Boundary
 
-The game ships no project-owned API keys. The Conductor Agent uses a 3-tier
-fallback: Chrome built-in Gemini Nano (free, on-device) → player-supplied
-Gemini API key (opt-in) → local rule-based engine (always available offline).
-No cost is charged to the project. Player progress is stored locally in the
-browser.
+The Conductor Agent uses a 2-tier architecture: Gemini 2.5 Flash via
+project-provided Free Tier API keys (three keys across separate Google Cloud
+projects, all with no billing enabled) → local rule-based engine (automatic
+fallback when quota is exhausted). No cost is charged to the project. Player
+progress is stored locally in the browser.
 
 ## Deployment
 
@@ -62,8 +62,8 @@ deploying the static game to GitHub Pages.
 - Full-screen landmark stages with layered depth, pointer parallax, mist, and
   reduced-motion support.
 - Cinematic station transitions that preview the next landmark.
-- A bilingual 3-tier Conductor Agent: Gemini Nano (on-device AI) → Gemini
-  Cloud API (player opt-in) → local rule-based fallback.
+- A bilingual 2-tier Conductor Agent: Gemini 2.5 Flash (Free Tier) → local
+  rule-based fallback.
 - Seeded event selection, seeded choice order, and changing decision
   priorities so the best route is not fixed across journeys.
 - Versioned local saves, recoverable mistakes, three normal endings, and one

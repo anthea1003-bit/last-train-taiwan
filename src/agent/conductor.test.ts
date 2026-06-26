@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createConductorReply } from './conductor';
+import { createConductorReply, createConductorReplyAsync } from './conductor';
 import { REGIONS } from '../content/regions';
 import { initGame } from '../engine/game';
 import { translate } from '../content/locales';
@@ -101,5 +101,88 @@ describe('車長 Agent', () => {
     expect(first.intent).toBe('station');
     expect(second.intent).toBe('station');
     expect(second.text).not.toBe(first.text);
+  });
+});
+
+describe('車長 Agent (Cloud API)', () => {
+  const challenge = REGIONS[0].events[1].challenge;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('雲端 API 回傳文字時，正確傳遞給玩家', async () => {
+    const mockResponse = {
+      candidates: [{
+        content: {
+          parts: [{ text: '注意這一站的石雕紋路，它藏著關鍵線索。' }]
+        }
+      }]
+    };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse)
+    }));
+
+    const state = initGame('cloud-hint');
+    const reply = await createConductorReplyAsync({
+      input: '給我提示',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.text).toContain('石雕紋路');
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('雲端 API 使用 Function Calling 時，正確處理工具回應', async () => {
+    const toolCallResponse = {
+      candidates: [{
+        content: {
+          parts: [{ functionCall: { name: 'check_resources', args: {} } }]
+        }
+      }]
+    };
+    const finalResponse = {
+      candidates: [{
+        content: {
+          parts: [{ text: '你的時間還很充裕，好好推理吧。' }]
+        }
+      }]
+    };
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(toolCallResponse) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(finalResponse) })
+    );
+
+    const state = { ...initGame('cloud-tool'), time: 8, fare: 500 };
+    const reply = await createConductorReplyAsync({
+      input: '我的資源夠嗎？',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.text).toContain('充裕');
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('所有 API Key 失敗時，自動退回本地規則引擎', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('quota exceeded')));
+
+    const state = initGame('cloud-fallback');
+    const reply = await createConductorReplyAsync({
+      input: '給我提示',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.intent).toBe('hint');
+    expect(reply.text.length).toBeGreaterThan(20);
+    for (const choice of challenge.choices) {
+      expect(reply.text).not.toContain(translate(choice.textId, 'zh-TW'));
+    }
   });
 });

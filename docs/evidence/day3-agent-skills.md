@@ -25,7 +25,7 @@ The skills are not decorative prompts. Each one defines:
 - acceptance checks.
 
 They preserve the course idea of reusable agent skills while respecting this
-project's zero-token public runtime.
+project's free-to-play public runtime (Gemini Free Tier, no billing).
 
 ## Demo Moment
 

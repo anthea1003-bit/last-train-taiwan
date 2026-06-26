@@ -2,9 +2,10 @@
 
 ## Scope
 
-The public game does not call external APIs at runtime. Tooling and
-interoperability are demonstrated as development-time workflow, which keeps the
-published player experience free and private.
+The public game calls Gemini 2.5 Flash via Free Tier API keys for the
+Conductor Agent. Tooling and interoperability are demonstrated as
+development-time workflow. The player experience is free (no billing) and
+private (no personal data collected).
 
 ## Evidence Boundary
 
@@ -49,5 +50,5 @@ surprises, or source poisoning during gameplay.
 
 For the submission video, show the repository evidence files and explain:
 
-> MCP and external research are used before release, while the public game
-> remains a static, zero-token experience.
+> MCP and external research are used before release. The public game uses
+> Gemini Free Tier for the Conductor Agent and remains free to play.

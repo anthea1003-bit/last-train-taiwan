@@ -2,26 +2,24 @@
 
 ## Security Boundary
 
-The public release uses a 3-tier Conductor Agent with progressive AI access:
+The public release uses a 2-tier Conductor Agent:
 
-- **Tier 1 (Gemini Nano)**: Chrome built-in on-device AI — zero network calls, zero cost;
-- **Tier 2 (Gemini Cloud API)**: opt-in by the player pasting their own API key — no project-bundled keys;
-- **Tier 3 (Local fallback)**: deterministic rule-based engine — always available offline;
-- no project-owned API keys shipped in the bundle or environment;
+- **Tier 1 (Gemini 2.5 Flash)**: project-provided Free Tier API keys from three separate Google Cloud projects, all with no billing enabled. Keys are injected at build time via GitHub Secrets and bundled into the static frontend. Players interact with Gemini AI immediately without any setup;
+- **Tier 2 (Local fallback)**: deterministic rule-based engine — activates automatically when Free Tier quota is exhausted or API calls fail;
+- no billing enabled on any Google Cloud project — zero financial risk;
 - no accounts, analytics, geolocation, or personal data collection;
 - no backend server;
-- no billable Google Cloud resources charged to the project;
-- progress and optional user API key stored only in browser `localStorage`.
+- progress stored only in browser `localStorage`.
 
-*Note on architectural evolution*: The initial phase of this project carried **no runtime Gemini or LLM calls** and **No API keys** to maintain a pure static boundary. We have upgraded it to support client-side Gemini Flash and Nano, while maintaining the same security constraints.
+*Note on architectural evolution*: The initial phase carried no runtime AI calls. We then added Gemini Nano and player opt-in Cloud API, but later simplified to project-provided Free Tier keys for a better player experience — every player gets Gemini AI out of the box with no setup required.
 
 
 ## Threat Model
 
 | Risk | Mitigation |
 | --- | --- |
-| API key leakage | User-supplied keys are stored in `localStorage` with a `type="password"` input and never sent to any server other than Google. The preloaded fallback API key is strictly limited to Google AI Studio's Free Tier (no billing, no financial exposure). |
-| Billing surprise | Default tier is Gemini Nano (free, on-device) or local fallback. Cloud API only activates when the player explicitly opts in with their own key, or falls back to the preloaded Free Tier key. |
+| API key exposure | Project-provided Free Tier keys are bundled in the frontend JS. Since all three Google Cloud projects have no billing enabled, exposed keys cannot incur charges. Quota is limited to 20 requests/day/project by Google's Free Tier. |
+| Billing surprise | All three Google Cloud projects have billing disabled. Even if keys are extracted, no charges can occur. |
 | Prompt injection via user input | The system prompt is hard-coded; user input is passed only as the user message, not interpolated into instructions. Gemini's own safety filters apply. |
 | Prompt injection through content | Content is typed data and rendered as React text, not raw HTML. |
 | Agent spoils answers | System prompt strictly forbids revealing or copying choice text. Local fallback also enforces non-spoiler rules via tests. |
@@ -70,12 +68,11 @@ npm run capstone:check
 
 ## Residual Risk
 
-- **Gemini Nano availability**: Chrome built-in AI is still rolling out and may
-  not be available in all browsers. The local fallback guarantees the game is
-  always playable.
-- **User API key in localStorage**: not encrypted. This is standard browser
-  practice for client-side keys but the settings panel makes the tradeoff
-  visible to the player.
+- **API keys in frontend bundle**: Free Tier keys are visible in the bundled
+  JS. This is acceptable because all three Google Cloud projects have no
+  billing enabled and quota is capped by Google at 20 requests/day/project.
+- **Free Tier quota exhaustion**: If quota runs out, the local rule-based
+  fallback activates automatically. The game remains fully playable.
 - **System prompt bypass**: a determined player could inspect the bundled JS
   and read the system prompt. This is acceptable since the game is
   single-player and the prompt contains no secrets beyond game hints.
