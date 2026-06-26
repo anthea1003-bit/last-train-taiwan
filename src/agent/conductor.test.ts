@@ -1,8 +1,11 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createConductorReply, createConductorReplyAsync } from './conductor';
+import * as conductor from './conductor';
 import { REGIONS } from '../content/regions';
 import { initGame } from '../engine/game';
+
+const { createConductorReply, createConductorReplyAsync } = conductor;
+
 import { translate } from '../content/locales';
 
 describe('車長 Agent', () => {
@@ -106,6 +109,10 @@ describe('車長 Agent', () => {
 
 describe('車長 Agent (Cloud API)', () => {
   const challenge = REGIONS[0].events[1].challenge;
+
+  beforeEach(() => {
+    vi.stubEnv('VITE_GEMINI_API_KEY', 'mock-api-key');
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();

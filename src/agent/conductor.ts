@@ -203,10 +203,11 @@ export type AgentMode = 'local' | 'cloud';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
 function getFallbackKeys(): string[] {
+  const g = globalThis as any;
   return [
-    (import.meta as any).env?.VITE_GEMINI_API_KEY || '',
-    (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || '',
-    (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || ''
+    (import.meta as any).env?.VITE_GEMINI_API_KEY || g.process?.env?.VITE_GEMINI_API_KEY || '',
+    (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || g.process?.env?.VITE_GEMINI_API_KEY_2 || '',
+    (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || g.process?.env?.VITE_GEMINI_API_KEY_3 || ''
   ].filter(Boolean);
 }
 
