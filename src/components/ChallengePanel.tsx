@@ -50,8 +50,8 @@ export default function ChallengePanel({
         <p className="station-code">
           {String(state.stepIndex + 1).padStart(2, '0')} / 07 · {regionName}
         </p>
-        <h1>{translate(challenge.textId, language)}</h1>
         <p className="event-description">{translate(eventDescId, language)}</p>
+        <h1>{translate(challenge.textId, language)}</h1>
         <div className={`scenario-cue cue-${modifier}`}>
           <small>{translate('scenario_current_rule', language)}</small>
           <strong>{translate(`scenario_${modifier.replace('-', '_')}`, language)}</strong>
