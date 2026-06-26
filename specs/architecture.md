@@ -27,7 +27,9 @@ Game engine (pure TypeScript)
         +----> versioned localStorage save
 ```
 
-The public runtime has no server and no model calls.
+The public runtime has no server. The Conductor Agent calls Gemini 2.5 Flash
+via project-provided Free Tier API keys (no billing enabled) and falls back
+to a local rule-based engine when quota is exhausted.
 
 ## Suggested Layout
 
@@ -119,7 +121,9 @@ without deleting the original value automatically.
 
 ## Security
 
-- No secrets in the repository or browser bundle.
+- Gemini Free Tier API keys are bundled in the frontend JS. All three Google
+  Cloud projects have no billing enabled, so exposed keys cannot incur charges.
+  Quota is capped at 20 requests/day/project by Google's Free Tier.
 - Treat content strings as untrusted; do not inject raw HTML.
 - Restrictive Content Security Policy compatible with static hosting.
 - Dependency and secret scanning in CI.
@@ -127,5 +131,6 @@ without deleting the original value automatically.
 
 ## Free Deployment
 
-Build to static files and deploy through GitHub Pages. Day 5 Google Cloud
-codelabs are optional and intentionally excluded from the zero-cost release.
+Build to static files and deploy through GitHub Pages. Gemini API usage is
+covered by Free Tier (no billing). Day 5 Google Cloud codelabs are optional
+and intentionally excluded.

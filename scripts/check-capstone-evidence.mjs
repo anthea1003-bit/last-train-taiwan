@@ -32,11 +32,15 @@ const requiredText = [
   },
   {
     file: 'docs/evidence/day4-security-evaluation.md',
-    snippets: ['Free Tier', 'no billing', 'Non-Spoiler Agent Evaluation']
+    snippets: ['Free Tier', 'no billing', 'Non-Spoiler Agent Evaluation', 'API key']
   },
   {
     file: 'docs/day2-day5-evidence.md',
     snippets: ['Day 2', 'Day 3', 'Day 4', 'Day 5']
+  },
+  {
+    file: 'specs/architecture.md',
+    snippets: ['Free Tier', 'no billing']
   }
 ];
 
