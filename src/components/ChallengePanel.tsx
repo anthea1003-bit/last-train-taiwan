@@ -81,14 +81,6 @@ export default function ChallengePanel({
         <div className="choice-list">
           <div className="choice-heading">
             <small>{translate('label_choose_route', language)}</small>
-            <span>
-              {translate(
-                challenge.correctChoiceId
-                  ? 'label_order_changes'
-                  : 'label_story_routes',
-                language
-              )}
-            </span>
           </div>
           {orderedChoices.map((choice, index) => {
             const isLocked = Boolean(
