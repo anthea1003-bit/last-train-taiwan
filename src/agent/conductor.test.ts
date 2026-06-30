@@ -192,4 +192,71 @@ describe('車長 Agent (Cloud API)', () => {
       expect(reply.text).not.toContain(translate(choice.textId, 'zh-TW'));
     }
   });
+
+  it('當只有 VITE_WORKER_URL 時，優先打 Worker 且成功回傳文字', async () => {
+    vi.stubEnv('VITE_GEMINI_API_KEY', '');
+    vi.stubEnv('VITE_GEMINI_API_KEY_2', '');
+    vi.stubEnv('VITE_GEMINI_API_KEY_3', '');
+    vi.stubEnv('VITE_WORKER_URL', 'https://mock-worker.xyz');
+
+    const mockResponse = {
+      candidates: [{
+        content: {
+          parts: [{ text: '這是由 Worker 代理回傳的車長分析。' }]
+        }
+      }]
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse)
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const state = initGame('cloud-worker-only');
+    const reply = await createConductorReplyAsync({
+      input: '給我提示',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.text).toContain('Worker');
+    expect(mockFetch).toHaveBeenCalledWith('https://mock-worker.xyz', expect.any(Object));
+  });
+
+  it('當 Worker 呼叫失敗但有傳統金鑰時，自動 fallback 到 API key 直連', async () => {
+    vi.stubEnv('VITE_WORKER_URL', 'https://mock-worker.xyz');
+    vi.stubEnv('VITE_GEMINI_API_KEY', 'valid-fallback-key');
+
+    const mockResponse = {
+      candidates: [{
+        content: {
+          parts: [{ text: 'Worker 失敗，但金鑰直連成功。' }]
+        }
+      }]
+    };
+
+    const mockFetch = vi.fn()
+      .mockRejectedValueOnce(new Error('Worker CORS or Network Error'))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const state = initGame('cloud-worker-fallback');
+    const reply = await createConductorReplyAsync({
+      input: '給我提示',
+      state,
+      challenge,
+      language: 'zh-TW'
+    });
+
+    expect(reply.text).toContain('金鑰直連');
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockFetch.mock.calls[0][0]).toBe('https://mock-worker.xyz');
+    expect(mockFetch.mock.calls[1][0]).toContain('generativelanguage.googleapis.com');
+    expect(mockFetch.mock.calls[1][0]).toContain('key=valid-fallback-key');
+  });
 });

@@ -7,3 +7,6 @@ vite.config.d.ts
 .playwright-mcp/
 .env
 .env.*
+cloudflare-worker/node_modules/
+cloudflare-worker/package.json
+cloudflare-worker/package-lock.json

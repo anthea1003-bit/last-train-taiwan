@@ -4,11 +4,11 @@
 
 The public release uses a 2-tier Conductor Agent:
 
-- **Tier 1 (Gemini 2.5 Flash)**: project-provided Free Tier API keys from three separate Google Cloud projects, all with no billing enabled. Keys are injected at build time via GitHub Secrets and bundled into the static frontend. Players interact with Gemini AI immediately without any setup;
-- **Tier 2 (Local fallback)**: deterministic rule-based engine — activates automatically when Free Tier quota is exhausted or API calls fail;
+- **Tier 1 (Gemini 2.5 Flash)**: secure connection through a Cloudflare Worker API proxy. The Worker securely stores three Free Tier API keys in its backend environment variables and randomly rotates them (45 RPM cap). Front-end client communicates only with the Worker URL, ensuring zero exposure of API keys;
+- **Tier 2 (Local fallback)**: deterministic rule-based engine — activates automatically when the Worker responds with an error, when free tier quota is exhausted, or when no internet connection is present;
 - no billing enabled on any Google Cloud project — zero financial risk;
 - no accounts, analytics, geolocation, or personal data collection;
-- no backend server;
+- zero-exposure of credentials in frontend;
 - progress stored only in browser `localStorage`.
 
 *Note on architectural evolution*: The initial phase carried no runtime AI calls. We then added Gemini Nano and player opt-in Cloud API, but later simplified to project-provided Free Tier keys for a better player experience — every player gets Gemini AI out of the box with no setup required.
@@ -18,8 +18,8 @@ The public release uses a 2-tier Conductor Agent:
 
 | Risk | Mitigation |
 | --- | --- |
-| API key exposure | Project-provided Free Tier keys are bundled in the frontend JS. Since all three Google Cloud projects have no billing enabled, exposed keys cannot incur charges. Quota is limited to 20 requests/day/project by Google's Free Tier. |
-| Billing surprise | All three Google Cloud projects have billing disabled. Even if keys are extracted, no charges can occur. |
+| API key exposure | API keys are securely stored in the Cloudflare Worker environment secrets. They are never exposed to the frontend JS bundle. |
+| Billing surprise | All three Google Cloud projects have billing disabled, and keys are hidden in the Worker. Even if the Worker URL is invoked directly, CORS validation blocks unauthorized domains, and Google's Free Tier caps quota to 20 requests/day/project. |
 | Prompt injection via user input | The system prompt is hard-coded; user input is passed only as the user message, not interpolated into instructions. Gemini's own safety filters apply. |
 | Prompt injection through content | Content is typed data and rendered as React text, not raw HTML. |
 | Agent spoils answers | System prompt strictly forbids revealing or copying choice text. Local fallback also enforces non-spoiler rules via tests. |
@@ -68,11 +68,8 @@ npm run capstone:check
 
 ## Residual Risk
 
-- **API keys in frontend bundle**: Free Tier keys are visible in the bundled
-  JS. This is acceptable because all three Google Cloud projects have no
-  billing enabled and quota is capped by Google at 20 requests/day/project.
-- **Free Tier quota exhaustion**: If quota runs out, the local rule-based
-  fallback activates automatically. The game remains fully playable.
+- **Worker endpoint exposure**: The Cloudflare Worker URL is visible in the frontend. To prevent abuse, the Worker implements a dynamic CORS validation policy that rejects requests whose origin is not the project's official GitHub Pages deployment domain (`https://anthea1003-bit.github.io`) or local development environment (`localhost` / `127.0.0.1`).
+- **Free Tier quota exhaustion**: If quota runs out or the Worker fails, the local rule-based fallback activates automatically. The game remains fully playable.
 - **System prompt bypass**: a determined player could inspect the bundled JS
   and read the system prompt. This is acceptable since the game is
   single-player and the prompt contains no secrets beyond game hints.
