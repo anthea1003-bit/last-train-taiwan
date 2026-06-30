@@ -24,3 +24,7 @@ gradients, excessive cards, and stock-photo aesthetics.
 
 Every milestone should leave durable evidence under `docs/evidence/`, such as
 research notes, test reports, screenshots, security scans, or walkthroughs.
+
+## Conversation Maintenance
+
+- When usage exceeds 80%, remind the user to package the conversation.

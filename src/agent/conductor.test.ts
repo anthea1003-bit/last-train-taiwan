@@ -107,18 +107,18 @@ describe('車長 Agent', () => {
   });
 });
 
-describe('車長 Agent (Cloud API)', () => {
+describe('車長 Agent (Worker 雲端代理)', () => {
   const challenge = REGIONS[0].events[1].challenge;
 
   beforeEach(() => {
-    vi.stubEnv('VITE_GEMINI_API_KEY', 'mock-api-key');
+    vi.stubEnv('VITE_WORKER_URL', 'https://mock-worker.xyz');
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('雲端 API 回傳文字時，正確傳遞給玩家', async () => {
+  it('Worker 回傳文字時，正確傳遞給玩家', async () => {
     const mockResponse = {
       candidates: [{
         content: {
@@ -126,10 +126,11 @@ describe('車長 Agent (Cloud API)', () => {
         }
       }]
     };
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockResponse)
-    }));
+    });
+    vi.stubGlobal('fetch', mockFetch);
 
     const state = initGame('cloud-hint');
     const reply = await createConductorReplyAsync({
@@ -140,10 +141,11 @@ describe('車長 Agent (Cloud API)', () => {
     });
 
     expect(reply.text).toContain('石雕紋路');
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch.mock.calls[0][0]).toBe('https://mock-worker.xyz');
   });
 
-  it('雲端 API 使用 Function Calling 時，正確處理工具回應', async () => {
+  it('Worker 使用 Function Calling 時，正確處理工具回應', async () => {
     const toolCallResponse = {
       candidates: [{
         content: {
@@ -175,8 +177,8 @@ describe('車長 Agent (Cloud API)', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  it('所有 API Key 失敗時，自動退回本地規則引擎', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('quota exceeded')));
+  it('Worker 失敗時，自動退回本地規則引擎', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Worker error')));
 
     const state = initGame('cloud-fallback');
     const reply = await createConductorReplyAsync({
@@ -191,72 +193,5 @@ describe('車長 Agent (Cloud API)', () => {
     for (const choice of challenge.choices) {
       expect(reply.text).not.toContain(translate(choice.textId, 'zh-TW'));
     }
-  });
-
-  it('當只有 VITE_WORKER_URL 時，優先打 Worker 且成功回傳文字', async () => {
-    vi.stubEnv('VITE_GEMINI_API_KEY', '');
-    vi.stubEnv('VITE_GEMINI_API_KEY_2', '');
-    vi.stubEnv('VITE_GEMINI_API_KEY_3', '');
-    vi.stubEnv('VITE_WORKER_URL', 'https://mock-worker.xyz');
-
-    const mockResponse = {
-      candidates: [{
-        content: {
-          parts: [{ text: '這是由 Worker 代理回傳的車長分析。' }]
-        }
-      }]
-    };
-
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockResponse)
-    });
-    vi.stubGlobal('fetch', mockFetch);
-
-    const state = initGame('cloud-worker-only');
-    const reply = await createConductorReplyAsync({
-      input: '給我提示',
-      state,
-      challenge,
-      language: 'zh-TW'
-    });
-
-    expect(reply.text).toContain('Worker');
-    expect(mockFetch).toHaveBeenCalledWith('https://mock-worker.xyz', expect.any(Object));
-  });
-
-  it('當 Worker 呼叫失敗但有傳統金鑰時，自動 fallback 到 API key 直連', async () => {
-    vi.stubEnv('VITE_WORKER_URL', 'https://mock-worker.xyz');
-    vi.stubEnv('VITE_GEMINI_API_KEY', 'valid-fallback-key');
-
-    const mockResponse = {
-      candidates: [{
-        content: {
-          parts: [{ text: 'Worker 失敗，但金鑰直連成功。' }]
-        }
-      }]
-    };
-
-    const mockFetch = vi.fn()
-      .mockRejectedValueOnce(new Error('Worker CORS or Network Error'))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      });
-    vi.stubGlobal('fetch', mockFetch);
-
-    const state = initGame('cloud-worker-fallback');
-    const reply = await createConductorReplyAsync({
-      input: '給我提示',
-      state,
-      challenge,
-      language: 'zh-TW'
-    });
-
-    expect(reply.text).toContain('金鑰直連');
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch.mock.calls[0][0]).toBe('https://mock-worker.xyz');
-    expect(mockFetch.mock.calls[1][0]).toContain('generativelanguage.googleapis.com');
-    expect(mockFetch.mock.calls[1][0]).toContain('key=valid-fallback-key');
   });
 });

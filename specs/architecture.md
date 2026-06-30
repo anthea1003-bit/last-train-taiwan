@@ -121,9 +121,9 @@ without deleting the original value automatically.
 
 ## Security
 
-- Gemini Free Tier API keys are bundled in the frontend JS. All three Google
-  Cloud projects have no billing enabled, so exposed keys cannot incur charges.
-  Quota is capped at 20 requests/day/project by Google's Free Tier.
+- Gemini API keys are stored as Cloudflare Worker secrets, never exposed in
+  the frontend JS. The Worker validates request Origin before proxying to
+  Gemini. All three Google Cloud projects have no billing enabled.
 - Treat content strings as untrusted; do not inject raw HTML.
 - Restrictive Content Security Policy compatible with static hosting.
 - Dependency and secret scanning in CI.

@@ -3,7 +3,6 @@ export default {
     const origin = request.headers.get("Origin");
     let allowedOrigin = "";
 
-    // CORS Origin 驗證安全機制 (限制只能由 GitHub Pages 及本地開發環境呼叫)
     if (origin) {
       if (
         origin === "https://anthea1003-bit.github.io" ||
@@ -12,6 +11,13 @@ export default {
       ) {
         allowedOrigin = origin;
       }
+    }
+
+    if (!allowedOrigin) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
     const corsHeaders = {

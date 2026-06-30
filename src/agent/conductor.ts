@@ -203,15 +203,6 @@ export type AgentMode = 'local' | 'cloud';
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
 
-function getFallbackKeys(): string[] {
-  const g = globalThis as any;
-  return [
-    (import.meta as any).env?.VITE_GEMINI_API_KEY || g.process?.env?.VITE_GEMINI_API_KEY || '',
-    (import.meta as any).env?.VITE_GEMINI_API_KEY_2 || g.process?.env?.VITE_GEMINI_API_KEY_2 || '',
-    (import.meta as any).env?.VITE_GEMINI_API_KEY_3 || g.process?.env?.VITE_GEMINI_API_KEY_3 || ''
-  ].filter(Boolean);
-}
-
 function getWorkerUrl(): string {
   const g = globalThis as any;
   return (import.meta as any).env?.VITE_WORKER_URL || g.process?.env?.VITE_WORKER_URL || '';
@@ -232,12 +223,8 @@ const CONDUCTOR_TOOLS = [
   }
 ];
 
-export async function detectAgentMode(userApiKey?: string | null): Promise<AgentMode> {
-  if (userApiKey || getWorkerUrl() || getFallbackKeys().length > 0) {
-    return 'cloud';
-  }
-
-  return 'local';
+export async function detectAgentMode(): Promise<AgentMode> {
+  return getWorkerUrl() ? 'cloud' : 'local';
 }
 
 export async function createConductorReplyAsync({
@@ -315,42 +302,7 @@ Please guide the player using the current journey state and the anomaly at this 
 6. When the player asks questions unrelated to the game (e.g., Taiwan geography, history), give a brief warm response, then gently steer back to the journey.`;
 
   try {
-    const workerUrl = getWorkerUrl();
-    const uniqueKeys = [...getFallbackKeys()];
-
-    if (!workerUrl && uniqueKeys.length === 0) {
-      throw new Error('No API Key or Worker URL available');
-    }
-
-    let replyText = '';
-    let lastError: Error | null = null;
-
-    if (workerUrl) {
-      try {
-        replyText = await callCloudGeminiAPI(systemPrompt, input, null, state);
-      } catch (e) {
-        lastError = e as Error;
-        console.warn(`[Conductor] Worker failed, falling back to keys...`, e);
-      }
-    }
-
-    if (!replyText && uniqueKeys.length > 0) {
-      for (const key of uniqueKeys) {
-        try {
-          replyText = await callCloudGeminiAPI(systemPrompt, input, key, state);
-          lastError = null;
-          break;
-        } catch (e) {
-          lastError = e as Error;
-          console.warn(`[Conductor] Key failed, trying next...`, e);
-        }
-      }
-    }
-
-    if (lastError && !replyText) {
-      throw lastError;
-    }
-
+    const replyText = await callCloudGeminiAPI(systemPrompt, input, state);
     const intent = detectIntent(input);
     return { intent, text: replyText.trim() };
   } catch (error) {
@@ -362,12 +314,9 @@ Please guide the player using the current journey state and the anomaly at this 
 async function callCloudGeminiAPI(
   systemPrompt: string,
   userPrompt: string,
-  apiKey: string | null,
   state: GameState
 ): Promise<string> {
-  const url = (apiKey === null && getWorkerUrl())
-    ? getWorkerUrl()
-    : `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const url = getWorkerUrl();
 
   const contents = [
     {
