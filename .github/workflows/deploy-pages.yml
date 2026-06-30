@@ -32,8 +32,6 @@ jobs:
 
       - name: Run tests
         run: npm test
-        env:
-          VITE_GEMINI_API_KEY: ci-test-key # secret-scan-ok (dummy key for mocked tests)
 
       - name: Type-check
         run: npm run typecheck
